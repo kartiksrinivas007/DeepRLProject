@@ -9,3 +9,5 @@ Player = torch.Tensor
 Reward = torch.Tensor
 Done  = torch.Tensor
 
+Action = torch.Tensor
+
