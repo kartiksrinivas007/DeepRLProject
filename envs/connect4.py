@@ -12,19 +12,19 @@ class Connect4Env:
     reward: Reward
 
 BOARD_STRING = """
- ? | ? | ? | ? | ? | ? | ?
+? | ? | ? | ? | ? | ? | ?
 ---|---|---|---|---|---|---
- ? | ? | ? | ? | ? | ? | ?
+? | ? | ? | ? | ? | ? | ?
 ---|---|---|---|---|---|---
- ? | ? | ? | ? | ? | ? | ?
+? | ? | ? | ? | ? | ? | ?
 ---|---|---|---|---|---|---
- ? | ? | ? | ? | ? | ? | ?
+? | ? | ? | ? | ? | ? | ?
 ---|---|---|---|---|---|---
- ? | ? | ? | ? | ? | ? | ?
+? | ? | ? | ? | ? | ? | ?
 ---|---|---|---|---|---|---
- ? | ? | ? | ? | ? | ? | ?
+? | ? | ? | ? | ? | ? | ?
 ---|---|---|---|---|---|---
- 1   2   3   4   5   6   7
+1   2   3   4   5   6   7
 """
 
 def print_board(board: Board):
@@ -84,7 +84,7 @@ def get_winner(board: Board) -> Player:
     return x_won - o_won
 
 #TODO(kartiksrinivas): Assess whether the types are generic enough
-def env_reset(_):
+def env_reset(_) -> Connect4Env:
     return Connect4Env(
         board=torch.zeros((6, 7), dtype=torch.int8),
         player=torch.tensor(1, dtype=torch.int8),
@@ -92,56 +92,94 @@ def env_reset(_):
         reward=torch.tensor(0, dtype=torch.int8),
     )
 
-def env_step(env: Connect4Env, action: Action) -> tuple[Connect4Env, Reward, Done]:
-    col = action
 
-    # Find the first empty row in the column.
-    # If the column is full, this will be the top row.
-    # torch.argmax will give the first occurence of the maximum
-    row = torch.argmax(env.board[:, col] == 0)
+def env_reset_dict(_) -> dict:
+    return {
+        "board" : torch.zeros((6, 7), dtype=torch.int8),
+        "player": torch.tensor(1, dtype=torch.int8),
+        "done": torch.tensor(False, dtype=torch.bool),
+        "reward": torch.tensor(0, dtype=torch.int8),
+    }
 
-    # If the column is full, the move is invalid.
-    invalid_move = env.board[row, col] != 0
+batched_get_winner = torch.compile(torch.vmap(get_winner, in_dims=0, out_dims=0))
 
-    # Place the player's piece in the board only if the move is valid and the game is not over.
+def env_step_batch(env: dict, action: Action):
+    """
+    Batched functional step for Connect4.
+    Each env in the batch is independent.
 
-    # --- PyTorch functional-style update ---
-    # JAX's .at[...].set(...) is functional (out-of-place) and returns a new array.
-    # PyTorch's indexing is in-place. To replicate the JAX behavior,
-    # we must clone() the board first.
-    board = env.board.clone()
+    Args:
+        env: batch of environments, a dict-like or dataclass with fields:
+              - board: (B, 6, 7) tensor
+              - player: (B,) tensor
+              - done: (B,) bool tensor
+              - reward: (B,) tensor
+        action: (B,) tensor of ints in [0, 6]
+
+    Returns:
+        next_env: updated env (same structure)
+        reward: (B,) tensor
+        done: (B,) tensor
+    """
+    board = env["board"]   # (B, 6, 7)
+    player = env["player"]
+    done = env["done"]
+
+    B = board.shape[0]
+    batch_idx = torch.arange(B)
+
+    # --- Find the first empty row in each chosen column ---
+    # For each batch i, we want board[i, :, col[i]]  → shape (B, 6)
+    col_vals = board[batch_idx, :, action]
     
-    # Determine the value to place
-    value_to_set = torch.where(env.done | invalid_move, 
-                               env.board[row, col],   # If game over/invalid, keep original value
-                               env.player)           # Otherwise, place the player's piece
+    # True where cell is empty
+    empty_mask = col_vals == 0  # (B, 6)
+    
+    # torch.argmax picks first True (0s are ignored, 1st True is max along dim)
+    # Reverse to find *bottom-most* empty cell if needed
+    row = torch.argmax(empty_mask.float(), dim=1)  # (B,)
 
-    # Update the cloned board
-    board[row, col] = value_to_set
-    # ----------------------------------------
+    # --- Check invalid moves (column full) ---
+    invalid_move = col_vals[torch.arange(B), row] != 0  # (B,)
 
-    # The reward is computed as follows:
-    # (Assuming get_winner is a PyTorch-compatible function)
-    reward = torch.where(env.done, 
-                         torch.tensor(0),  # Use torch.tensor for constants
-                         torch.where(invalid_move, 
-                                     torch.tensor(-1), 
-                                     get_winner(board) * env.player)
-                        ).to(torch.int8)
+    # --- Clone board (functional) ---
+    new_board = board.clone()
 
-    # We end the game if:
-    # * the game was already over
-    # * the move won or lost the game (reward != 0)
-    # * the move was invalid
-    # * the board is full (draw)
-    done = env.done | (reward != 0) | invalid_move | torch.all(board[-1] != 0)
+    # Prepare index tensors for batch scatter
+    
+    # Value to place (either unchanged or player's piece)
+    value_to_set = torch.where(done | invalid_move,
+                               new_board[batch_idx, row, action],
+                               player)
 
-    env = Connect4Env(
-        board=board,
-        # switch player
-        player=torch.where(done, env.player, -env.player),
-        done=done,
-        reward=reward, # reward is embedded inside the env
+    # Functional scatter update
+    new_board[batch_idx, row, action] = value_to_set
+
+
+    # --- Compute reward ---
+    reward = torch.where(
+        done,
+        torch.tensor(0, dtype=torch.int8),
+        torch.where(
+            invalid_move,
+            torch.tensor(-1, dtype=torch.int8),
+            batched_get_winner(new_board) * player,
+        ),
     )
 
-    return env, reward, done
+    # --- Compute done ---
+    board_full = torch.all(new_board[:, -1, :] != 0, dim=1)
+    done = done | (reward != 0) | invalid_move | board_full
+
+    # --- Switch player (only if not done) ---
+    next_player = torch.where(done, player, -player)
+
+    # --- Return new env ---
+    next_env = {
+        "board": new_board,
+        "player": next_player,
+        "done":done,
+        "reward":reward,
+    }
+
+    return next_env, reward, done
