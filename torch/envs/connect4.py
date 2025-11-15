@@ -184,32 +184,12 @@ def env_step_batch(env: dict, action: Action):
 
     return next_env, reward, done
 
-def valid_action_mask(env: dict) -> torch.Tensor:
-    '''
-    Computes which actions are valid in the current state.
-    Returns an array of booleans, indicating which columns are not full.
-    In case the game is over, all columns are considered invalid.
-    '''
-    return torch.where(env["done"], torch.tensor([False] * env["board"].shape[1]), env["board"][-1] == 0)
+
+## Steps
 
 
-def winning_action_mask(env: dict, player: Player) -> torch.Tensor:
-    '''
-    Finds all actions that would immediately win the game for the given player.
-    '''
-    # Override the next player in the environment with the given player.
-    env = {
-        "board" : env.board, player=player, done=env.done, reward=env.reward
-    }
-
-    # Play all actions and check the reward.
-    # Remember that the reward is for the current player, so we expect it to be 1.
-    env, reward, done = jax.vmap(env_step, (None, 0))(env, jnp.arange(7, dtype=jnp.int8))
-    return reward == 1
-
-def policy_function(env: Env) -> chex.Array:
-    return sum((
-        valid_action_mask(env).astype(jnp.float32) * 100,
-        winning_action_mask(env, -env.player).astype(jnp.float32) * 200,
-        winning_action_mask(env, env.player).astype(jnp.float32) * 300,
-    ))
+# Define winning action masks, and other action masks
+# define a policy function that takes actions according to the action mask
+# Step 1. Define the policy function 
+# Step 2. Define the random rollout function 
+# Step 3. Define the value function
