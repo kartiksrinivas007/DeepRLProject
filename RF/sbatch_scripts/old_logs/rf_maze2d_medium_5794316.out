@@ -10,3 +10,19 @@ returns std : 0.032420385628938675
 returns min : 0.0
 Using Minari eval environment: PointMaze_Medium-v3
 Running initial evaluation before training...
+Iteration 1/7 - last training loss: 1.8855, last eval raw return: 37.80, last eval normalized score: 5.87
+Iteration 2/7 - last training loss: 1.9000, last eval raw return: 0.00, last eval normalized score: -5.14
+Iteration 3/7 - last training loss: 1.9254, last eval raw return: 25.78, last eval normalized score: 2.36
+Iteration 4/7 - last training loss: 1.9474, last eval raw return: 2.01, last eval normalized score: -4.56
+Iteration 5/7 - last training loss: 1.9550, last eval raw return: 1.49, last eval normalized score: -4.71
+Iteration 6/7 - last training loss: 1.9427, last eval raw return: 0.25, last eval normalized score: -5.07
+Iteration 7/7 - last training loss: 1.9042, last eval raw return: 19.21, last eval normalized score: 0.45
+Evaluation scores over iterations: [np.float64(-4.732228782974445), np.float64(5.865051649607507), np.float64(-5.142840638152806), np.float64(2.364658387732403), np.float64(-4.557500333962377), np.float64(-4.708931656439503), np.float64(-5.070037117731111), np.float64(0.45138187105025296)]
+Raw returns over iterations: [1.41, 37.8, 0.0, 25.78, 2.01, 1.49, 0.25, 19.21]
+Saved raw return evaluation plot to plots/maze2d-medium-v1_eval_raw_return_25-11-16-16-45-40.png
+Saved normalized evaluation plot to plots/maze2d-medium-v1_eval_25-11-16-16-45-40.png
+============================================================
+finished training!
+finished training at: 25-11-16-17-25-34
+============================================================
+Sun Nov 16 17:25:34 EST 2025

@@ -1,0 +1,49 @@
+Loaded best model from runs/td3_mujoco/hopper/medium_v0/20251102-014258/best.pt for final evaluation
+Final evaluation...
+Final performance: 4.9 ± 0.1
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251102-014258/training_curves.png
+Final training curves saved: runs/td3_mujoco/hopper/medium_v0/20251102-014258/training_curves.png
+Final model saved: runs/td3_mujoco/hopper/medium_v0/20251102-014258/final.pt
+Training log saved: runs/td3_mujoco/hopper/medium_v0/20251102-014258/training_log.json
+
+All artifacts saved to: runs/td3_mujoco/hopper/medium_v0/20251102-014258
+
+
+
+
+
+BC
+
+Training completed! Total steps: 100000
+Total TD3 updates: 100000
+Loaded best model from runs/td3_mujoco/hopper/medium_v0/20251102-021150/best.pt for final evaluation
+Final evaluation...
+Final performance: 975.9 ± 199.2
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251102-021150/training_curves.png
+Final training curves saved: runs/td3_mujoco/hopper/medium_v0/20251102-021150/training_curves.png
+Final model saved: runs/td3_mujoco/hopper/medium_v0/20251102-021150/final.pt
+Training log saved: runs/td3_mujoco/hopper/medium_v0/20251102-021150/training_log.json
+
+All artifacts saved to: runs/td3_mujoco/hopper/medium_v0/20251102-021150
+Training complete!
+
+
+CQL
+
+
+    )
+AttributeError: Unexpected mode: None, expected modes: human, rgb_array, depth_array, or rgbd_tuple
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251102-030120/training_curves.png
+
+Training completed! Total steps: 100000
+Total TD3 updates: 100000
+Loaded best model from runs/td3_mujoco/hopper/medium_v0/20251102-030120/best.pt for final evaluation
+Final evaluation...
+Final performance: 1344.6 ± 937.8
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251102-030120/training_curves.png
+Final training curves saved: runs/td3_mujoco/hopper/medium_v0/20251102-030120/training_curves.png
+Final model saved: runs/td3_mujoco/hopper/medium_v0/20251102-030120/final.pt
+Training log saved: runs/td3_mujoco/hopper/medium_v0/20251102-030120/training_log.json
+
+All artifacts saved to: runs/td3_mujoco/hopper/medium_v0/20251102-030120
+Training complete!

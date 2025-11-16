@@ -79,3 +79,52 @@ time/evaluation: 245.12915897369385
 training/train_loss_mean: 0.060719601590186356
 training/train_loss_std: 0.003490539203790776
 training/action_error: 0.06606334447860718
+================================================================================
+Iteration 7
+time/training: 132.40009140968323
+evaluation/target_3600_normalized_score_mean: 54.273003831666465
+evaluation/target_3600_normalized_score_std: 31.314795444080435
+evaluation/target_1800_normalized_score_mean: 65.27287770051133
+evaluation/target_1800_normalized_score_std: 31.364490147740465
+time/total: 2163.6716783046722
+time/evaluation: 202.62983059883118
+training/train_loss_mean: 0.05905993681699038
+training/train_loss_std: 0.0034140850547674717
+training/action_error: 0.05996447056531906
+================================================================================
+Iteration 8
+time/training: 132.6013503074646
+evaluation/target_3600_normalized_score_mean: 42.877147531244844
+evaluation/target_3600_normalized_score_std: 20.211020277882312
+evaluation/target_1800_normalized_score_mean: 53.53022519793235
+evaluation/target_1800_normalized_score_std: 28.092198245321583
+time/total: 2458.1995611190796
+time/evaluation: 161.9255814552307
+training/train_loss_mean: 0.057746398735791446
+training/train_loss_std: 0.0033188414220148223
+training/action_error: 0.057706013321876526
+================================================================================
+Iteration 9
+time/training: 132.4193992614746
+evaluation/target_3600_normalized_score_mean: 53.899936983948955
+evaluation/target_3600_normalized_score_std: 25.734849948474764
+evaluation/target_1800_normalized_score_mean: 65.53342988872602
+evaluation/target_1800_normalized_score_std: 30.04170283515784
+time/total: 2787.83890748024
+time/evaluation: 197.2190387248993
+training/train_loss_mean: 0.05668308711759746
+training/train_loss_std: 0.003287914436003427
+training/action_error: 0.05941997841000557
+================================================================================
+Iteration 10
+time/training: 132.36243844032288
+evaluation/target_3600_normalized_score_mean: 74.781910000266
+evaluation/target_3600_normalized_score_std: 34.31545359175891
+evaluation/target_1800_normalized_score_mean: 75.8399984935645
+evaluation/target_1800_normalized_score_std: 33.79899190392125
+time/total: 3177.5174112319946
+time/evaluation: 257.31510949134827
+training/train_loss_mean: 0.055799739434570075
+training/train_loss_std: 0.0032936033732909515
+training/action_error: 0.05817028135061264
+Sun Nov 16 05:29:32 PM EST 2025

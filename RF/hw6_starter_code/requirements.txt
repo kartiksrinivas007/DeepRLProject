@@ -1,0 +1,7 @@
+torch
+minari[hf,hdf5]
+gymnasium[mujoco]
+matplotlib
+Pillow
+moviepy
+

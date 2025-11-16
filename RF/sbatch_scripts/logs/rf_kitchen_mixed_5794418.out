@@ -1,2 +1,12 @@
 Running Reinformer Kitchen-mixed experiment on babel-q5-32
 Sun Nov 16 17:04:30 EST 2025
+============================================================
+start time: 25-11-16-17-04-33
+============================================================
+dataset size: 621
+returns max : 496.0
+returns mean: 342.7665100097656
+returns std : 92.28872680664062
+returns min : 2.0
+Using Minari eval environment: FrankaKitchen-v1
+Running initial evaluation before training...
