@@ -30,6 +30,12 @@ class D4RLTrajectoryDataset(Dataset):
         with open(dataset_path, "rb") as f:
             self.trajectories = pickle.load(f)
 
+        # ensure consistent float32 dtypes for continuous data
+        for traj in self.trajectories:
+            traj["observations"] = traj["observations"].astype(np.float32)
+            traj["actions"] = traj["actions"].astype(np.float32)
+            traj["rewards"] = traj["rewards"].astype(np.float32)
+
         # reward scale
         if env_name in ["hopper", "walker2d"]:
             scale = 1000

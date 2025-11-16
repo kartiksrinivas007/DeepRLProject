@@ -16,8 +16,12 @@ def Reinformer_eval(
     returns = []
     lengths = []
 
-    state_dim = env.observation_space.shape[0]
-    act_dim = env.action_space.shape[0]
+    # infer dimensions from dataset statistics / env action space
+    state_dim = state_mean.shape[0]
+    act_space = env.action_space
+    if getattr(act_space, "shape", None) is None:
+        raise ValueError("Unsupported action space without shape attribute.")
+    act_dim = act_space.shape[0]
 
     state_mean = torch.from_numpy(state_mean).to(device)
     state_std = torch.from_numpy(state_std).to(device)
@@ -46,7 +50,18 @@ def Reinformer_eval(
             )
 
             # init episode
-            running_state = env.reset()
+            obs, _ = env.reset()
+
+            def _extract_obs(o):
+                if isinstance(o, dict):
+                    if "observation" in o:
+                        return o["observation"]
+                    raise ValueError(
+                        f"Dict observation missing 'observation' key: {list(o.keys())}"
+                    )
+                return o
+
+            running_state = _extract_obs(obs)
             episode_return = 0
             episode_length = 0
 
@@ -54,46 +69,42 @@ def Reinformer_eval(
                 # add state in placeholder and normalize
                 states[0, t] = torch.from_numpy(running_state).to(device)
                 states[0, t] = (states[0, t] - state_mean) / state_std
-                # predict rtg by model
+                # predict rtg and action by model (single forward pass)
                 if t < context_len:
-                    rtg_preds, _, _ = model.forward(
+                    rtg_preds, act_dist_preds, _ = model.forward(
                         timesteps[:, :context_len],
                         states[:, :context_len],
                         actions[:, :context_len],
                         returns_to_go[:, :context_len],
                     )
                     rtg = rtg_preds[0, t].detach()
+                    act = act_dist_preds.mean.reshape(
+                        eval_batch_size, -1, act_dim
+                    )[0, t].detach()
                 else:
-                    rtg_preds, _, _ = model.forward(
+                    rtg_preds, act_dist_preds, _ = model.forward(
                         timesteps[:, t - context_len + 1 : t + 1],
                         states[:, t - context_len + 1 : t + 1],
                         actions[:, t - context_len + 1 : t + 1],
                         returns_to_go[:, t - context_len + 1 : t + 1],
                     )
                     rtg = rtg_preds[0, -1].detach()
+                    act = act_dist_preds.mean.reshape(
+                        eval_batch_size, -1, act_dim
+                    )[0, -1].detach()
+
                 # add rtg in placeholder
                 returns_to_go[0, t] = rtg
-                # take action by model
-                if t < context_len:
-                    _, act_dist_preds, _ = model.forward(
-                        timesteps[:, :context_len],
-                        states[:, :context_len],
-                        actions[:, :context_len],
-                        returns_to_go[:, :context_len],
-                    )
-                    act = act_dist_preds.mean.reshape(eval_batch_size, -1, act_dim)[0, t].detach()
-                else:
-                    _, act_dist_preds, _ = model.forward(
-                        timesteps[:, t - context_len + 1 : t + 1],
-                        states[:, t - context_len + 1 : t + 1],
-                        actions[:, t - context_len + 1 : t + 1],
-                        returns_to_go[:, t - context_len + 1 : t + 1],
-                    )
-                    act = act_dist_preds.mean.reshape(eval_batch_size, -1, act_dim)[0, -1].detach()
-                # env step
-                running_state, running_reward, done, _ = env.step(
-                    act.cpu().numpy()
-                )
+                # env step (Gymnasium API)
+                (
+                    obs,
+                    running_reward,
+                    terminated,
+                    truncated,
+                    _,
+                ) = env.step(act.cpu().numpy())
+                running_state = _extract_obs(obs)
+                done = bool(terminated or truncated)
                 # add action in placeholder
                 actions[0, t] = act
                 # calculate return and episode length
