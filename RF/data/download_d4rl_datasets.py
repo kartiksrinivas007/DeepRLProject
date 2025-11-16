@@ -77,6 +77,15 @@ def download_d4rl_data() -> None:
     d4rl_to_minari = {
         "antmaze-medium-diverse-v2": "D4RL/antmaze/medium-diverse-v1",
         "hopper-medium-v2": "mujoco/hopper/medium-v0",
+        # Hopper Simple dataset (no direct D4RL counterpart).
+        # We treat "hopper-simple-v0" as a D4RL-style ID used only inside
+        # this codebase and save the converted trajectories under that name.
+        "hopper-simple-v0": "mujoco/hopper/simple-v0",
+        # Additional Mujoco tasks.
+        "walker2d-medium-v2": "mujoco/walker2d/medium-v0",
+        # Maze and Kitchen tasks from the D4RL suite.
+        "maze2d-medium-v1": "D4RL/pointmaze/medium-v2",
+        "kitchen-mixed-v0": "D4RL/kitchen/mixed-v2",
         # If you want more AntMaze variants, add them here, e.g.:
         # "antmaze-medium-play-v2": "D4RL/antmaze/medium-play-v1",
         # "antmaze-umaze-v2": "D4RL/antmaze/umaze-v1",
@@ -88,7 +97,7 @@ def download_d4rl_data() -> None:
     for d4rl_env_id, minari_id in d4rl_to_minari.items():
         pkl_file_path = os.path.join(data_dir, d4rl_env_id)
 
-        print(f"Processing dataset: {d4rl_env_id} (Minari ID: {minari_id})")
+        print(f"Processing D4RL dataset: {d4rl_env_id} (Minari ID: {minari_id})")
 
         try:
             # This requires minari[hf] and internet access the first time.

@@ -1,0 +1,1 @@
+python main.py --env maze2d --dataset medium --dataset_dir data/d4rl_dataset/ --tau 0.99 --context_len 10 --lr 4e-4 --max_train_iters 7 --num_updates_per_iter 5000 --n_blocks 5

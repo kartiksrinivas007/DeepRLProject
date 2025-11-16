@@ -1,0 +1,1 @@
+python main.py --env walker2d --dataset medium --dataset_dir data/d4rl_dataset/ --tau 0.99 --context_len 5 --lr 1e-4 --max_train_iters 3 --num_updates_per_iter 5000 --n_blocks 4

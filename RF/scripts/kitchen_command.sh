@@ -1,0 +1,1 @@
+python main.py --env kitchen --dataset mixed --dataset_dir data/d4rl_dataset/ --context_len 20 --tau 0.9 --n_blocks 5 --max_train_iters 10 --num_updates_per_iter 5000

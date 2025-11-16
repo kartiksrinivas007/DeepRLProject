@@ -36,8 +36,15 @@ def experiment(variant):
     
     if dataset == "complete":
         variant["batch_size"] = 16
+
+    # Build a D4RL-style ID for locating the offline dataset on disk.
+    # Most tasks follow the original D4RL versioning, but some Minari-only
+    # datasets (e.g. hopper-simple-v0) are handled specially.
     if env == "kitchen":
         d4rl_env = f"{env}-{dataset}-v0"
+    elif env == "hopper" and dataset == "simple":
+        # Minari-only dataset; we save trajectories under this pseudo-D4RL ID.
+        d4rl_env = "hopper-simple-v0"
     elif env in ["pen", "door", "hammer", "relocate", "maze2d"]:
         d4rl_env = f"{env}-{dataset}-v1"
     elif env in ["halfcheetah", "hopper", "walker2d", "antmaze"]:
@@ -88,7 +95,7 @@ def experiment(variant):
     eval_dataset_for_norm = None
     use_minari_norm = False
 
-    # For AntMaze and Hopper, prefer the Minari-provided evaluation environment.
+    # For some tasks, prefer the Minari-provided evaluation environment.
     if env == "antmaze" and dataset == "medium-diverse":
         try:
             minari_id = "D4RL/antmaze/medium-diverse-v1"
@@ -107,9 +114,13 @@ def experiment(variant):
                 f"Warning: could not recover AntMaze evaluation env from Minari. "
                 f"Falling back to D4RL id '{d4rl_env}' if available. Error: {e}"
             )
-    elif env == "hopper" and dataset == "medium":
+    elif env == "hopper" and dataset in ["medium", "simple"]:
         try:
-            minari_id = "mujoco/hopper/medium-v0"
+            if dataset == "medium":
+                minari_id = "mujoco/hopper/medium-v0"
+            else:
+                # hopper-simple-v0 Minari dataset
+                minari_id = "mujoco/hopper/simple-v0"
             ds = minari.load_dataset(minari_id)
             eval_dataset_for_norm = ds
             eval_env = ds.recover_environment(
@@ -118,13 +129,74 @@ def experiment(variant):
             eval_env.reset(seed=seed)
             env_spec = ds._eval_env_spec or ds.spec.env_spec
             eval_env_id = env_spec.id if env_spec is not None else d4rl_env
-            # Hopper Minari datasets do not provide ref_min_score/ref_max_score,
-            # so we do not use Minari normalization here.
-            use_minari_norm = False
+            # For hopper-medium-v0, Minari currently does not provide
+            # ref_min_score/ref_max_score, so we do not use Minari
+            # normalization there. For hopper-simple-v0 we try Minari
+            # normalization (if available) via use_minari_norm.
+            if dataset == "simple":
+                use_minari_norm = True
+            else:
+                use_minari_norm = False
             print(f"Using Minari eval environment: {eval_env_id}")
         except Exception as e:
             print(
                 f"Warning: could not recover Hopper evaluation env from Minari. "
+                f"Falling back to D4RL id '{d4rl_env}' if available. Error: {e}"
+            )
+    elif env == "walker2d" and dataset == "medium":
+        try:
+            minari_id = "mujoco/walker2d/medium-v0"
+            ds = minari.load_dataset(minari_id)
+            eval_dataset_for_norm = ds
+            eval_env = ds.recover_environment(
+                eval_env=True, max_episode_steps=variant["max_eval_ep_len"]
+            )
+            eval_env.reset(seed=seed)
+            env_spec = ds._eval_env_spec or ds.spec.env_spec
+            eval_env_id = env_spec.id if env_spec is not None else d4rl_env
+            # Walker2d-medium-v0 has D4RL reference scores; we prefer
+            # Minari normalization when available.
+            use_minari_norm = True
+            print(f"Using Minari eval environment: {eval_env_id}")
+        except Exception as e:
+            print(
+                f"Warning: could not recover Walker2d evaluation env from Minari. "
+                f"Falling back to D4RL id '{d4rl_env}' if available. Error: {e}"
+            )
+    elif env == "maze2d" and dataset == "medium":
+        try:
+            minari_id = "D4RL/pointmaze/medium-v2"
+            ds = minari.load_dataset(minari_id)
+            eval_dataset_for_norm = ds
+            eval_env = ds.recover_environment(
+                eval_env=True, max_episode_steps=variant["max_eval_ep_len"]
+            )
+            eval_env.reset(seed=seed)
+            env_spec = ds._eval_env_spec or ds.spec.env_spec
+            eval_env_id = env_spec.id if env_spec is not None else d4rl_env
+            use_minari_norm = True
+            print(f"Using Minari eval environment: {eval_env_id}")
+        except Exception as e:
+            print(
+                f"Warning: could not recover Maze2d evaluation env from Minari. "
+                f"Falling back to D4RL id '{d4rl_env}' if available. Error: {e}"
+            )
+    elif env == "kitchen" and dataset == "mixed":
+        try:
+            minari_id = "D4RL/kitchen/mixed-v2"
+            ds = minari.load_dataset(minari_id)
+            eval_dataset_for_norm = ds
+            eval_env = ds.recover_environment(
+                eval_env=True, max_episode_steps=variant["max_eval_ep_len"]
+            )
+            eval_env.reset(seed=seed)
+            env_spec = ds._eval_env_spec or ds.spec.env_spec
+            eval_env_id = env_spec.id if env_spec is not None else d4rl_env
+            use_minari_norm = True
+            print(f"Using Minari eval environment: {eval_env_id}")
+        except Exception as e:
+            print(
+                f"Warning: could not recover Kitchen evaluation env from Minari. "
                 f"Falling back to D4RL id '{d4rl_env}' if available. Error: {e}"
             )
 
@@ -164,53 +236,80 @@ def experiment(variant):
                     num_eval_ep=variant["num_eval_ep"],
                     max_test_ep_len=variant["max_eval_ep_len"],
                 )
+                raw_return = float(return_mean)
+
+                normalized_score = None
+
                 # Prefer Minari normalization if reference scores are available.
                 if use_minari_norm and eval_dataset_for_norm is not None:
                     try:
                         norm_score = minari.get_normalized_score(
-                            eval_dataset_for_norm, np.array([return_mean])
+                            eval_dataset_for_norm, np.array([raw_return])
                         )[0]
-                        return norm_score * 100.0
+                        normalized_score = norm_score * 100.0
                     except ValueError:
-                        # Dataset does not have reference scores; fall through.
-                        pass
-                # For dense Mujoco tasks like hopper, compute D4RL-style
-                # normalized score manually using REF_MIN/REF_MAX from d4rl.
-                if env == "hopper" and dataset == "medium":
+                        # Dataset does not have reference scores; for
+                        # hopper-simple, fall back to normalizing by the
+                        # min/max returns observed in the offline dataset.
+                        if env == "hopper" and dataset == "simple":
+                            try:
+                                ret_max, _, _, ret_min = traj_dataset.get_return_stats()
+                                if ret_max > ret_min:
+                                    norm = (raw_return - ret_min) / (ret_max - ret_min)
+                                    normalized_score = norm * 100.0
+                            except Exception:
+                                pass
+                # For dense Mujoco tasks like hopper and walker2d, compute
+                # D4RL-style normalized score manually using REF_MIN/REF_MAX
+                # from d4rl for the classic D4RL medium datasets.
+                if (
+                    normalized_score is None
+                    and env in ["hopper", "walker2d"]
+                    and dataset == "medium"
+                ):
                     try:
                         from d4rl import infos as d4rl_infos
 
+                        key_medium = f"{env}-medium-v0"
+                        key_random = f"{env}-random-v0"
                         ref_min = d4rl_infos.REF_MIN_SCORE.get(
-                            "hopper-medium-v0",
-                            d4rl_infos.REF_MIN_SCORE["hopper-random-v0"],
+                            key_medium,
+                            d4rl_infos.REF_MIN_SCORE[key_random],
                         )
                         ref_max = d4rl_infos.REF_MAX_SCORE.get(
-                            "hopper-medium-v0",
-                            d4rl_infos.REF_MAX_SCORE["hopper-random-v0"],
+                            key_medium,
+                            d4rl_infos.REF_MAX_SCORE[key_random],
                         )
-                        norm = (return_mean - ref_min) / (ref_max - ref_min)
-                        return norm * 100.0
+                        norm = (raw_return - ref_min) / (ref_max - ref_min)
+                        normalized_score = norm * 100.0
                     except Exception:
                         pass
                 # Next, try D4RL-style env normalization if available.
-                if hasattr(eval_env, "get_normalized_score"):
-                    return eval_env.get_normalized_score(return_mean) * 100.0
-                # Fallback: return the raw average return.
-                return return_mean
+                if normalized_score is None and hasattr(eval_env, "get_normalized_score"):
+                    normalized_score = eval_env.get_normalized_score(raw_return) * 100.0
+                # Fallback: if normalization still not available, just use raw return.
+                if normalized_score is None:
+                    normalized_score = raw_return
+
+                return raw_return, normalized_score
 
     max_train_iters = variant["max_train_iters"]
     num_updates_per_iter = variant["num_updates_per_iter"]
     normalized_d4rl_score_list = []
+    raw_return_list = []
 
     # Optional initial evaluation before any training updates.
     if evaluator is not None:
         print("Running initial evaluation before training...")
-        init_score = evaluator(model=Trainer.model)
+        init_raw_return, init_score = evaluator(model=Trainer.model)
+        raw_return_list.append(init_raw_return)
         normalized_d4rl_score_list.append(init_score)
         if args.use_wandb:
             wandb.log(
                 data={
                     "evaluation/score": init_score,
+                    "evaluation/score_normalized": init_score,
+                    "evaluation/score_raw": init_raw_return,
                     "evaluation/iteration": 0,
                 }
             )
@@ -255,14 +354,17 @@ def experiment(variant):
                 )
         t2 = time.time()
         if evaluator is not None:
-            normalized_d4rl_score = evaluator(model=Trainer.model)
+            raw_return, normalized_d4rl_score = evaluator(model=Trainer.model)
             t3 = time.time()
+            raw_return_list.append(raw_return)
             normalized_d4rl_score_list.append(normalized_d4rl_score)
             if args.use_wandb:
                 wandb.log(
                     data={
                         "training/time": t2 - t1,
                         "evaluation/score": normalized_d4rl_score,
+                        "evaluation/score_normalized": normalized_d4rl_score,
+                        "evaluation/score_raw": raw_return,
                         "evaluation/time": t3 - t2,
                     }
                 )
@@ -272,7 +374,8 @@ def experiment(variant):
             f"Iteration {itr}/{max_train_iters} - "
             f"last training loss: {loss:.4f}"
             + (
-                f", last eval score: {normalized_d4rl_score:.2f}"
+                f", last eval raw return: {raw_return:.2f}, "
+                f"last eval normalized score: {normalized_d4rl_score:.2f}"
                 if evaluator is not None
                 else ""
             )
@@ -288,10 +391,16 @@ def experiment(variant):
     if normalized_d4rl_score_list:
         print("Evaluation scores over iterations:", normalized_d4rl_score_list)
 
-        # Plot evaluation curve if matplotlib is available.
+        if raw_return_list:
+            print("Raw returns over iterations:", raw_return_list)
+
+        # Plot evaluation curves if matplotlib is available.
         if plt is not None:
             os.makedirs("plots", exist_ok=True)
-            plot_path = os.path.join("plots", f"{d4rl_env}_eval.png")
+            # Use start_time_str to avoid overwriting previous runs.
+            plot_path_norm = os.path.join(
+                "plots", f"{d4rl_env}_eval_{start_time_str}.png"
+            )
             plt.figure()
             plt.plot(normalized_d4rl_score_list, marker="o")
             plt.xlabel("Training iteration")
@@ -299,9 +408,28 @@ def experiment(variant):
             plt.title(f"Online evaluation - {eval_env_id or d4rl_env}")
             plt.grid(True)
             plt.tight_layout()
-            plt.savefig(plot_path)
+            plt.savefig(plot_path_norm)
             plt.close()
-            print(f"Saved evaluation plot to {plot_path}")
+
+            # Raw return plot.
+            if raw_return_list:
+                plot_path_raw = os.path.join(
+                    "plots", f"{d4rl_env}_eval_raw_return_{start_time_str}.png"
+                )
+                plt.figure()
+                plt.plot(raw_return_list, marker="o")
+                plt.xlabel("Training iteration")
+                plt.ylabel("Average return per episode")
+                plt.title(
+                    f"Online evaluation (raw returns) - {eval_env_id or d4rl_env}"
+                )
+                plt.grid(True)
+                plt.tight_layout()
+                plt.savefig(plot_path_raw)
+                plt.close()
+                print(f"Saved raw return evaluation plot to {plot_path_raw}")
+
+            print(f"Saved normalized evaluation plot to {plot_path_norm}")
         else:
             print("matplotlib not available; skipping evaluation plot.")
     else:

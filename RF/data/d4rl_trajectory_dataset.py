@@ -72,14 +72,21 @@ class D4RLTrajectoryDataset(Dataset):
                 traj["observations"] - self.state_mean
             ) / self.state_std
 
-        # calculate returns max, mean, std
+        # calculate returns max, mean, std, min
         returns = np.array(returns)
         self.return_stats = [
             returns.max(),
             returns.mean(),
-            returns.std()
+            returns.std(),
+            returns.min(),
         ]
-        print(f"dataset size: {len(self.trajectories)}\nreturns max : {returns.max()}\nreturns mean: {returns.mean()}\nreturns std : {returns.std()}")
+        print(
+            "dataset size: " + str(len(self.trajectories))
+            + f"\nreturns max : {returns.max()}"
+            + f"\nreturns mean: {returns.mean()}"
+            + f"\nreturns std : {returns.std()}"
+            + f"\nreturns min : {returns.min()}"
+        )
 
     def get_state_stats(self):
         return self.state_mean, self.state_std
