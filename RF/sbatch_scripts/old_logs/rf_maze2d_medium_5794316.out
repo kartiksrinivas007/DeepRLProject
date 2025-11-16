@@ -1,0 +1,12 @@
+Running Reinformer Maze2d-medium experiment on babel-x9-32
+Sun Nov 16 16:45:38 EST 2025
+============================================================
+start time: 25-11-16-16-45-40
+============================================================
+dataset size: 4752
+returns max : 1.0
+returns mean: 0.99894779920578
+returns std : 0.032420385628938675
+returns min : 0.0
+Using Minari eval environment: PointMaze_Medium-v3
+Running initial evaluation before training...

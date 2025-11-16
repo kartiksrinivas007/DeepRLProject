@@ -1,0 +1,100 @@
+Running Behavior Cloning (BC) Hopper-medium experiment on babel-m5-28
+Sun Nov 16 04:36:26 PM EST 2025
+Using Minari eval environment from 'mujoco/hopper/medium-v0' (env id: Hopper-v5)
+==================================================
+Starting new experiment: hopper medium
+1327 trajectories, 999404 timesteps found
+Average return: 2817.79, std: 877.09
+Max return: 3908.85, min: 1350.34
+==================================================
+================================================================================
+Iteration 1
+time/training: 91.65390014648438
+evaluation/target_3600_normalized_score_mean: 19.905399981189557
+evaluation/target_3600_normalized_score_std: 0.9751187871199799
+time/total: 99.92380261421204
+time/evaluation: 8.268090009689331
+training/train_loss_mean: 0.14141842084601522
+training/train_loss_std: 0.06040378478153914
+================================================================================
+Iteration 2
+time/training: 91.4339988231659
+evaluation/target_3600_normalized_score_mean: 15.272825946954645
+evaluation/target_3600_normalized_score_std: 0.9993721367475166
+time/total: 198.15233755111694
+time/evaluation: 6.7936811447143555
+training/train_loss_mean: 0.08679306738786399
+training/train_loss_std: 0.012101720994039741
+================================================================================
+Iteration 3
+time/training: 95.62448930740356
+evaluation/target_3600_normalized_score_mean: 25.13462392705292
+evaluation/target_3600_normalized_score_std: 3.217367357720087
+time/total: 303.66711926460266
+time/evaluation: 9.889233350753784
+training/train_loss_mean: 0.07695829177387059
+training/train_loss_std: 0.010500128377987987
+================================================================================
+Iteration 4
+time/training: 93.06854915618896
+evaluation/target_3600_normalized_score_mean: 19.771691968323395
+evaluation/target_3600_normalized_score_std: 0.32227501798428465
+time/total: 404.83520340919495
+time/evaluation: 8.09856653213501
+training/train_loss_mean: 0.07224758446067571
+training/train_loss_std: 0.009831910001532313
+================================================================================
+Iteration 5
+time/training: 91.29971718788147
+evaluation/target_3600_normalized_score_mean: 23.98083176221753
+evaluation/target_3600_normalized_score_std: 1.1723271698714743
+time/total: 505.6109766960144
+time/evaluation: 9.475162267684937
+training/train_loss_mean: 0.06932298734113573
+training/train_loss_std: 0.009567921294184852
+================================================================================
+Iteration 6
+time/training: 91.08432054519653
+evaluation/target_3600_normalized_score_mean: 25.546564031041985
+evaluation/target_3600_normalized_score_std: 1.3615816303460642
+time/total: 606.6165137290955
+time/evaluation: 9.920315504074097
+training/train_loss_mean: 0.0670629664823413
+training/train_loss_std: 0.009219567862706737
+================================================================================
+Iteration 7
+time/training: 91.04109263420105
+evaluation/target_3600_normalized_score_mean: 23.383029092634164
+evaluation/target_3600_normalized_score_std: 0.16260877501169724
+time/total: 707.0001814365387
+time/evaluation: 9.341606378555298
+training/train_loss_mean: 0.06535074876323342
+training/train_loss_std: 0.008960380078022655
+================================================================================
+Iteration 8
+time/training: 91.28390216827393
+evaluation/target_3600_normalized_score_mean: 33.29978168767
+evaluation/target_3600_normalized_score_std: 1.1980809097742202
+time/total: 810.2744414806366
+time/evaluation: 11.989466428756714
+training/train_loss_mean: 0.06410417659990489
+training/train_loss_std: 0.008980024701015657
+================================================================================
+Iteration 9
+time/training: 91.12354230880737
+evaluation/target_3600_normalized_score_mean: 21.974684554014306
+evaluation/target_3600_normalized_score_std: 0.20435888547321676
+time/total: 910.1754851341248
+time/evaluation: 8.776525497436523
+training/train_loss_mean: 0.06317629290521144
+training/train_loss_std: 0.008734286398409846
+================================================================================
+Iteration 10
+time/training: 91.01179432868958
+evaluation/target_3600_normalized_score_mean: 22.38959471930972
+evaluation/target_3600_normalized_score_std: 0.20734149502797591
+time/total: 1010.0431399345398
+time/evaluation: 8.854885816574097
+training/train_loss_mean: 0.06229414383545518
+training/train_loss_std: 0.008701852031291141
+Sun Nov 16 04:53:24 PM EST 2025

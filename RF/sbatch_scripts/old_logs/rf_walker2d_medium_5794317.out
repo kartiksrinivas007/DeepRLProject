@@ -1,0 +1,24 @@
+Running Reinformer Walker2d-medium experiment on babel-p5-24
+Sun Nov 16 16:45:37 EST 2025
+============================================================
+start time: 25-11-16-16-45-40
+============================================================
+dataset size: 1044
+returns max : 6198.8984375
+returns mean: 5701.642578125
+returns std : 1179.248291015625
+returns min : 0.20352840423583984
+Using Minari eval environment: Walker2d-v5
+Running initial evaluation before training...
+Iteration 1/3 - last training loss: 5.2380, last eval raw return: 495.55, last eval normalized score: 10.76
+Iteration 2/3 - last training loss: 5.3639, last eval raw return: 416.91, last eval normalized score: 9.05
+Iteration 3/3 - last training loss: 5.4557, last eval raw return: 978.55, last eval normalized score: 21.28
+Evaluation scores over iterations: [0.01700353090402412, 10.759249949224253, 9.046236186186228, 21.280642141688187]
+Raw returns over iterations: [2.4095841608267907, 495.5507743758126, 416.9119484670583, 978.5532737098072]
+Saved raw return evaluation plot to plots/walker2d-medium-v2_eval_raw_return_25-11-16-16-45-40.png
+Saved normalized evaluation plot to plots/walker2d-medium-v2_eval_25-11-16-16-45-40.png
+============================================================
+finished training!
+finished training at: 25-11-16-16-52-52
+============================================================
+Sun Nov 16 16:52:53 EST 2025

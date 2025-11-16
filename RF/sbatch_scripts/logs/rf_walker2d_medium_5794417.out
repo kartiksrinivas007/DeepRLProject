@@ -1,0 +1,12 @@
+Running Reinformer Walker2d-medium experiment on babel-q5-24
+Sun Nov 16 17:04:29 EST 2025
+============================================================
+start time: 25-11-16-17-04-32
+============================================================
+dataset size: 1044
+returns max : 6198.8984375
+returns mean: 5701.642578125
+returns std : 1179.248291015625
+returns min : 0.20352840423583984
+Using Minari eval environment: Walker2d-v5
+Running initial evaluation before training...
