@@ -1,0 +1,198 @@
+Running TD3 Hopper-medium with CQL alpha 5 on babel-x9-32
+Sun Nov 16 18:53:49 EST 2025
+============================================================
+TD3 Training Configuration
+============================================================
+agent               : td3
+alpha               : 0.2
+batch_size          : 128
+bc_regularization_weight: 0.0
+clip_coef           : 0.2
+cpu                 : False
+cql_alpha           : 5.0
+cql_n_actions       : 4
+cql_temp            : 1.0
+delay               : 2
+ent_coef            : 0.01
+env_id              : mujoco/hopper/medium-v0
+eval_episodes       : 100
+eval_every          : 50000
+exploration_noise   : 0.1
+gae_lambda          : 0.98
+gamma               : 0.99
+log_every           : 10000
+lr                  : 0.0003
+max_grad_norm       : 0.5
+minibatch_size      : 128
+noise_clip          : 0.5
+out_dir             : runs/td3_mujoco/hopper/medium_v0/20251116-185353
+plot_every          : 1000
+policy_noise        : 0.2
+rollout_steps       : 4096
+seed                : 42000
+tau                 : 0.005
+total_steps         : 100000
+update_epochs       : 10
+update_every        : 1
+utd_ratio           : 1
+vf_coef             : 0.5
+video_dir           : runs/td3_mujoco/hopper/medium_v0/20251116-185353/videos
+video_every         : 100000
+video_prefix        : eval
+============================================================
+Using device: cuda
+Environment: mujoco/hopper/medium-v0
+Obs dim: 11, Action dim: 3
+Created TD3 agent
+Starting TD3 training...
+Target steps: 100000
+Batch size: 128
+Update every: 1
+--------------------------------------------------
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+[Step    10000] Updates: 10000 | Actor: -75.5612 | C1:  1.3187 | C2:  1.3303 | α:  0.000 | Q1:   75.45 | Q2:   75.37 | DDPG: -75.5612 | BC:  0.0000 | Ret:     0.0
+CQL Loss: 2.2557 | cql_current_actions: 75.5337 | in_distribution_q_pred: 75.1684 | cql_random_actions: 72.3091
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+[Step    20000] Updates: 20000 | Actor: -134.5927 | C1:  2.0223 | C2:  2.6383 | α:  0.000 | Q1:  134.92 | Q2:  134.86 | DDPG: -134.5927 | BC:  0.0000 | Ret:     0.0
+CQL Loss: 1.8386 | cql_current_actions: 134.7238 | in_distribution_q_pred: 134.5377 | cql_random_actions: 129.7671
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+[Step    30000] Updates: 30000 | Actor: -177.1896 | C1:  3.8359 | C2:  4.1159 | α:  0.000 | Q1:  177.57 | Q2:  177.54 | DDPG: -177.1896 | BC:  0.0000 | Ret:     0.0
+CQL Loss: 1.8682 | cql_current_actions: 177.4681 | in_distribution_q_pred: 177.1509 | cql_random_actions: 172.2798
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+[Step    40000] Updates: 40000 | Actor: -202.7863 | C1:  4.2668 | C2:  4.0594 | α:  0.000 | Q1:  202.58 | Q2:  203.06 | DDPG: -202.7863 | BC:  0.0000 | Ret:     0.0
+CQL Loss: 2.5080 | cql_current_actions: 202.8014 | in_distribution_q_pred: 202.3365 | cql_random_actions: 197.9269
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+[Step    50000] Updates: 50000 | Actor: -236.0078 | C1:  6.1512 | C2:  8.3049 | α:  0.000 | Q1:  235.76 | Q2:  235.56 | DDPG: -236.0078 | BC:  0.0000 | Ret:     0.0
+CQL Loss: 2.0409 | cql_current_actions: 235.9033 | in_distribution_q_pred: 235.0787 | cql_random_actions: 228.8741
+
+--- Evaluation at step 50000 ---
+Eval: 450.6 ± 2.8 (normalized: 14.5)
+New best model saved! Return: 450.6
+--- End Evaluation ---
+
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+[Step    60000] Updates: 60000 | Actor: -244.5594 | C1:  5.6936 | C2:  5.2384 | α:  0.000 | Q1:  244.67 | Q2:  244.14 | DDPG: -244.5594 | BC:  0.0000 | Ret:     0.0
+CQL Loss: 2.4837 | cql_current_actions: 244.7472 | in_distribution_q_pred: 243.8185 | cql_random_actions: 239.4588
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+[Step    70000] Updates: 70000 | Actor: -257.4732 | C1:  7.3579 | C2:  9.7040 | α:  0.000 | Q1:  257.42 | Q2:  257.75 | DDPG: -257.4732 | BC:  0.0000 | Ret:     0.0
+CQL Loss: 2.2098 | cql_current_actions: 257.6125 | in_distribution_q_pred: 256.9752 | cql_random_actions: 249.1622
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+[Step    80000] Updates: 80000 | Actor: -269.9845 | C1:  5.1932 | C2:  5.2054 | α:  0.000 | Q1:  269.36 | Q2:  269.13 | DDPG: -269.9845 | BC:  0.0000 | Ret:     0.0
+CQL Loss: 2.5306 | cql_current_actions: 269.5880 | in_distribution_q_pred: 268.6416 | cql_random_actions: 262.4490
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+[Step    90000] Updates: 90000 | Actor: -276.7519 | C1:  9.7197 | C2: 12.8133 | α:  0.000 | Q1:  276.31 | Q2:  276.07 | DDPG: -276.7519 | BC:  0.0000 | Ret:     0.0
+CQL Loss: 2.3940 | cql_current_actions: 276.6699 | in_distribution_q_pred: 275.4611 | cql_random_actions: 268.0996
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+[Step   100000] Updates: 100000 | Actor: -257.1199 | C1:  9.5076 | C2:  6.8845 | α:  0.000 | Q1:  257.16 | Q2:  257.24 | DDPG: -257.1199 | BC:  0.0000 | Ret:     0.0
+CQL Loss: 2.5549 | cql_current_actions: 257.6161 | in_distribution_q_pred: 256.4807 | cql_random_actions: 250.6680
+
+--- Evaluation at step 100000 ---
+Eval: 9.0 ± 0.2 (normalized: 0.9)
+--- End Evaluation ---
+
+Recording video at step 100000...
+Video recording failed: Unexpected mode: None, expected modes: human, rgb_array, depth_array, or rgbd_tuple
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+
+Training completed! Total steps: 100000
+Total TD3 updates: 100000
+Loaded best model from runs/td3_mujoco/hopper/medium_v0/20251116-185353/best.pt for final evaluation
+Final evaluation...
+Final performance: 450.9 ± 2.9 (normalized: 14.5)
+Training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Final training curves saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_curves.png
+Final model saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/final.pt
+Training log saved: runs/td3_mujoco/hopper/medium_v0/20251116-185353/training_log.json
+
+All artifacts saved to: runs/td3_mujoco/hopper/medium_v0/20251116-185353
+Training complete!
+Sun Nov 16 19:05:42 EST 2025

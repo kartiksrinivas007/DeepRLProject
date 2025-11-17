@@ -86,19 +86,73 @@ def initialize_log(agent_type):
     return base_log
 
 
-def _compute_normalized_score(minari_dataset, raw_return: float) -> float | None:
-    """Compute D4RL-style normalized score (0-100) via Minari if available."""
-    if minari_dataset is None:
-        return None
-    try:
-        scores = minari_get_normalized_score(
-            minari_dataset, np.asarray([raw_return], dtype=np.float32)
-        )
-        # Minari's utility returns values in [0, 1]; scale to [0, 100].
-        return float(scores[0] * 100.0)
-    except Exception as e:
-        print(f"Warning: could not compute normalized score via Minari: {e}")
-        return None
+def _compute_normalized_score(
+    env_id: str, minari_dataset, eval_env, raw_return: float
+) -> float:
+    """
+    Compute a D4RL-style normalized score (0-100) following the same logic
+    as RF/main.py:
+      1) Prefer Minari dataset reference scores if available.
+      2) Fall back to D4RL REF_MIN/REF_MAX for classic Mujoco medium tasks.
+      3) Fall back to env.get_normalized_score if available.
+      4) Finally, just use the raw return.
+    """
+    normalized_score: float | None = None
+
+    # 1) Prefer Minari normalization if reference scores are available.
+    if minari_dataset is not None:
+        try:
+            scores = minari_get_normalized_score(
+                minari_dataset, np.asarray([raw_return], dtype=np.float32)
+            )
+            normalized_score = float(scores[0] * 100.0)
+        except Exception:
+            # Minari dataset may not have ref_min_score/ref_max_score.
+            pass
+
+    # 2) For dense Mujoco tasks like hopper and walker2d on the classic
+    # medium datasets, use D4RL's REF_MIN/REF_MAX statistics.
+    if normalized_score is None:
+        try:
+            # env_id is a Minari ID, e.g. "mujoco/hopper/medium-v0"
+            parts = env_id.split("/")
+            env_base = None
+            dataset_str = ""
+            if len(parts) == 3 and parts[0] == "mujoco":
+                env_base = parts[1]
+                dataset_str = parts[2]
+
+            if env_base in ["hopper", "walker2d"] and dataset_str.startswith("medium"):
+                from d4rl import infos as d4rl_infos
+
+                key_medium = f"{env_base}-medium-v0"
+                key_random = f"{env_base}-random-v0"
+                ref_min = d4rl_infos.REF_MIN_SCORE.get(
+                    key_medium,
+                    d4rl_infos.REF_MIN_SCORE[key_random],
+                )
+                ref_max = d4rl_infos.REF_MAX_SCORE.get(
+                    key_medium,
+                    d4rl_infos.REF_MAX_SCORE[key_random],
+                )
+                if ref_max > ref_min:
+                    norm = (raw_return - ref_min) / (ref_max - ref_min)
+                    normalized_score = float(norm * 100.0)
+        except Exception:
+            pass
+
+    # 3) Next, try D4RL-style env normalization if available.
+    if normalized_score is None and hasattr(eval_env, "get_normalized_score"):
+        try:
+            normalized_score = float(eval_env.get_normalized_score(raw_return) * 100.0)
+        except Exception:
+            pass
+
+    # 4) Fallback: if normalization still not available, just use raw return.
+    if normalized_score is None:
+        normalized_score = float(raw_return)
+
+    return normalized_score
 
 
 def log_training_stats(agent_type, stats, log, total_steps, updates_performed):
@@ -280,18 +334,17 @@ def run(args):
                     seed=1000,
                     device=device,
                 )
-            norm_score = _compute_normalized_score(minari_dataset, mean_r)
+            norm_score = _compute_normalized_score(
+                args.env_id, minari_dataset, eval_env, mean_r
+            )
             log["eval_mean"].append(mean_r)
             log["eval_std"].append(std_r)
             log["eval_steps"].append(total_steps)
-            if norm_score is not None:
-                log["eval_normalized"].append(norm_score)
-                print(
-                    f"Eval: {mean_r:.1f} ± {std_r:.1f} "
-                    f"(normalized: {norm_score:.1f})"
-                )
-            else:
-                print(f"Eval: {mean_r:.1f} ± {std_r:.1f}")
+            log["eval_normalized"].append(norm_score)
+            print(
+                f"Eval: {mean_r:.1f} ± {std_r:.1f} "
+                f"(normalized: {norm_score:.1f})"
+            )
 
             # Save best model
             if mean_r > best_eval:
@@ -376,15 +429,14 @@ def run(args):
                 seed=4200,
                 device=device,
             )
-        final_norm = _compute_normalized_score(minari_dataset, mean_r)
-        if final_norm is not None:
-            print(
-                f"Final performance: {mean_r:.1f} ± {std_r:.1f} "
-                f"(normalized: {final_norm:.1f})"
-            )
-            log["eval_normalized"].append(final_norm)
-        else:
-            print(f"Final performance: {mean_r:.1f} ± {std_r:.1f}")
+        final_norm = _compute_normalized_score(
+            args.env_id, minari_dataset, eval_env, mean_r
+        )
+        print(
+            f"Final performance: {mean_r:.1f} ± {std_r:.1f} "
+            f"(normalized: {final_norm:.1f})"
+        )
+        log["eval_normalized"].append(final_norm)
         log["eval_mean"].append(mean_r)
         log["eval_std"].append(std_r)
         log["eval_steps"].append(total_steps)
