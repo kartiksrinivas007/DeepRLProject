@@ -62,6 +62,8 @@ class ReinFormerTrainer:
         returns_to_go,
         rewards,
         traj_mask,
+        beta_rl: float = 0.0,
+        adv_scale: float = 1.0,
     ):
         self.model.train()
         # data to gpu ------------------------------------------------
@@ -108,15 +110,24 @@ class ReinFormerTrainer:
         )
         # action_loss ------------------------------------------------
         actions_target = torch.clone(actions)
-        log_likelihood = actions_dist_preds.log_prob(
-            actions_target
-            ).sum(axis=2)[
+        log_prob_all = actions_dist_preds.log_prob(actions_target).sum(axis=2)
+        log_likelihood = log_prob_all[
             traj_mask > 0
         ].mean()
         entropy = actions_dist_preds.entropy().sum(axis=2).mean()
         action_loss = -(log_likelihood + self.model.temperature().detach() * entropy)
 
-        loss = returns_to_go_loss + action_loss
+        rl_loss = 0.0
+        if beta_rl > 0.0:
+            # Advantage-weighted policy improvement (AWAC-style).
+            adv = returns_to_go_target - returns_to_go_preds.detach()
+            weights = torch.exp(adv / max(adv_scale, 1e-6))
+            rl_loss = -(
+                weights.view(-1)[traj_mask.view(-1,) > 0]
+                * log_prob_all.view(-1)[traj_mask.view(-1,) > 0]
+            ).mean()
+
+        loss = returns_to_go_loss + action_loss + beta_rl * rl_loss
 
         # optimization -----------------------------------------------
         self.optimizer.zero_grad()

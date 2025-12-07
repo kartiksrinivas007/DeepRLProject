@@ -23,6 +23,27 @@ from trainer import ReinFormerTrainer
 from eval import Reinformer_eval
 
 
+def reward_scale_for_env(env_name: str) -> float:
+    if env_name in ["hopper", "walker2d"]:
+        return 1000.0
+    if env_name in ["halfcheetah"]:
+        return 5000.0
+    if env_name in ["maze2d", "kitchen"]:
+        return 100.0
+    if env_name in ["pen", "door", "hammer", "relocate"]:
+        return 10000.0
+    if env_name in ["antmaze"]:
+        return 1.0
+    return 1.0
+
+
+def discount_cumsum_np(x, gamma=1.0):
+    disc_cumsum = np.zeros_like(x)
+    disc_cumsum[-1] = x[-1]
+    for t in reversed(range(x.shape[0] - 1)):
+        disc_cumsum[t] = x[t] + gamma * disc_cumsum[t + 1]
+    return disc_cumsum
+
 
 def experiment(variant):
     # seeding
@@ -88,6 +109,217 @@ def experiment(variant):
     sample_traj = traj_dataset.trajectories[0]
     state_dim = sample_traj["observations"].shape[1]
     act_dim = sample_traj["actions"].shape[1]
+    reward_scale = reward_scale_for_env(env)
+
+    def preprocess_reward(r):
+        if env == "antmaze":
+            return r * 100 + 1
+        return r
+
+    def compute_returns_to_go_from_rewards(rewards_np):
+        return discount_cumsum_np(rewards_np, gamma=1.0) / reward_scale
+
+    def collect_online_trajectory(model, env_for_rollout, use_mean_action=False):
+        eval_batch_size = 1
+        states = []
+        actions = []
+        rewards_list = []
+
+        # infer dimensions from dataset statistics / env action space
+        state_dim_local = state_mean.shape[0]
+        act_space = env_for_rollout.action_space
+        if getattr(act_space, "shape", None) is None:
+            raise ValueError("Unsupported action space without shape attribute.")
+        act_dim_local = act_space.shape[0]
+
+        state_mean_t = torch.from_numpy(state_mean).to(device)
+        state_std_t = torch.from_numpy(state_std).to(device)
+
+        timesteps_all = torch.arange(
+            start=0, end=variant["max_eval_ep_len"], step=1
+        ).repeat(eval_batch_size, 1).to(device)
+
+        model.eval()
+        with torch.no_grad():
+            obs, _ = env_for_rollout.reset()
+
+            def _extract_obs(o):
+                if isinstance(o, dict):
+                    if "observation" in o:
+                        return o["observation"]
+                    raise ValueError(
+                        f"Dict observation missing 'observation' key: {list(o.keys())}"
+                    )
+                return o
+
+            running_state = _extract_obs(obs)
+
+            actions_buf = torch.zeros(
+                (eval_batch_size, variant["max_eval_ep_len"], act_dim_local),
+                dtype=torch.float32,
+                device=device,
+            )
+            states_buf = torch.zeros(
+                (eval_batch_size, variant["max_eval_ep_len"], state_dim_local),
+                dtype=torch.float32,
+                device=device,
+            )
+            returns_to_go_buf = torch.zeros(
+                (eval_batch_size, variant["max_eval_ep_len"], 1),
+                dtype=torch.float32,
+                device=device,
+            )
+
+            for t in range(variant["max_eval_ep_len"]):
+                states_buf[0, t] = torch.from_numpy(running_state).to(device)
+                states_buf[0, t] = (states_buf[0, t] - state_mean_t) / state_std_t
+
+                if t < variant["context_len"]:
+                    rtg_preds, act_dist_preds, _ = model.forward(
+                        timesteps_all[:, : variant["context_len"]],
+                        states_buf[:, : variant["context_len"]],
+                        actions_buf[:, : variant["context_len"]],
+                        returns_to_go_buf[:, : variant["context_len"]],
+                    )
+                    rtg = rtg_preds[0, t].detach()
+                    act_dist = act_dist_preds
+                    act = (
+                        act_dist.mean.reshape(eval_batch_size, -1, act_dim_local)[
+                            0, t
+                        ].detach()
+                        if use_mean_action
+                        else act_dist.rsample().reshape(
+                            eval_batch_size, -1, act_dim_local
+                        )[0, t].detach()
+                    )
+                else:
+                    rtg_preds, act_dist_preds, _ = model.forward(
+                        timesteps_all[:, t - variant["context_len"] + 1 : t + 1],
+                        states_buf[:, t - variant["context_len"] + 1 : t + 1],
+                        actions_buf[:, t - variant["context_len"] + 1 : t + 1],
+                        returns_to_go_buf[:, t - variant["context_len"] + 1 : t + 1],
+                    )
+                    rtg = rtg_preds[0, -1].detach()
+                    act_dist = act_dist_preds
+                    act = (
+                        act_dist.mean.reshape(eval_batch_size, -1, act_dim_local)[
+                            0, -1
+                        ].detach()
+                        if use_mean_action
+                        else act_dist.rsample().reshape(
+                            eval_batch_size, -1, act_dim_local
+                        )[0, -1].detach()
+                    )
+
+                returns_to_go_buf[0, t] = rtg
+                actions_buf[0, t] = act
+
+                (
+                    obs,
+                    running_reward,
+                    terminated,
+                    truncated,
+                    _,
+                ) = env_for_rollout.step(act.cpu().numpy())
+                running_state = _extract_obs(obs)
+
+                rewards_list.append(preprocess_reward(running_reward))
+                states.append(states_buf[0, t].cpu().numpy())
+                actions.append(act.cpu().numpy())
+
+                done = bool(terminated or truncated)
+                if done:
+                    break
+
+        traj_len = len(rewards_list)
+        returns_to_go_np = compute_returns_to_go_from_rewards(
+            np.array(rewards_list, dtype=np.float32)
+        )
+        return {
+            "observations": np.array(states, dtype=np.float32),
+            "actions": np.array(actions, dtype=np.float32),
+            "rewards": np.array(rewards_list, dtype=np.float32),
+            "returns_to_go": returns_to_go_np.astype(np.float32),
+            "traj_len": traj_len,
+        }
+
+    def sample_online_batch(replay_buffer, batch_size, context_len):
+        batch_timesteps, batch_states, batch_actions = [], [], []
+        batch_returns_to_go, batch_rewards, batch_masks = [], [], []
+
+        for _ in range(batch_size):
+            traj = random.choice(replay_buffer)
+            traj_len = traj["observations"].shape[0]
+
+            if traj_len >= context_len:
+                si = random.randint(0, traj_len - context_len)
+                states_slice = traj["observations"][si : si + context_len]
+                actions_slice = traj["actions"][si : si + context_len]
+                returns_slice = traj["returns_to_go"][si : si + context_len]
+                rewards_slice = traj["rewards"][si : si + context_len]
+                timesteps = np.arange(si, si + context_len)
+                mask = np.ones(context_len, dtype=np.float32)
+            else:
+                padding_len = context_len - traj_len
+                states_slice = np.concatenate(
+                    [
+                        traj["observations"],
+                        np.zeros((padding_len, state_dim), dtype=np.float32),
+                    ],
+                    axis=0,
+                )
+                actions_slice = np.concatenate(
+                    [
+                        traj["actions"],
+                        np.zeros((padding_len, act_dim), dtype=np.float32),
+                    ],
+                    axis=0,
+                )
+                returns_slice = np.concatenate(
+                    [
+                        traj["returns_to_go"],
+                        np.zeros((padding_len,), dtype=np.float32),
+                    ],
+                    axis=0,
+                )
+                rewards_slice = np.concatenate(
+                    [
+                        traj["rewards"],
+                        np.zeros((padding_len,), dtype=np.float32),
+                    ],
+                    axis=0,
+                )
+                timesteps = np.arange(0, context_len)
+                mask = np.concatenate(
+                    [
+                        np.ones(traj_len, dtype=np.float32),
+                        np.zeros(padding_len, dtype=np.float32),
+                    ],
+                    axis=0,
+                )
+
+            batch_timesteps.append(timesteps)
+            batch_states.append(states_slice)
+            batch_actions.append(actions_slice)
+            batch_returns_to_go.append(returns_slice)
+            batch_rewards.append(rewards_slice)
+            batch_masks.append(mask)
+
+        timesteps_t = torch.from_numpy(np.stack(batch_timesteps)).long().to(device)
+        states_t = torch.from_numpy(np.stack(batch_states)).float().to(device)
+        actions_t = torch.from_numpy(np.stack(batch_actions)).float().to(device)
+        returns_t = torch.from_numpy(np.stack(batch_returns_to_go)).float().to(device)
+        rewards_t = torch.from_numpy(np.stack(batch_rewards)).float().to(device)
+        masks_t = torch.from_numpy(np.stack(batch_masks)).long().to(device)
+
+        return (
+            timesteps_t,
+            states_t,
+            actions_t,
+            returns_t,
+            rewards_t,
+            masks_t,
+        )
 
     # Try to create an evaluation environment if available.
     eval_env = None
@@ -298,88 +530,193 @@ def experiment(variant):
     normalized_d4rl_score_list = []
     raw_return_list = []
 
-    # Optional initial evaluation before any training updates.
-    if evaluator is not None:
-        print("Running initial evaluation before training...")
-        init_raw_return, init_score = evaluator(model=Trainer.model)
-        raw_return_list.append(init_raw_return)
-        normalized_d4rl_score_list.append(init_score)
-        if args.use_wandb:
-            wandb.log(
-                data={
-                    "evaluation/score": init_score,
-                    "evaluation/score_normalized": init_score,
-                    "evaluation/score_raw": init_raw_return,
-                    "evaluation/iteration": 0,
-                }
-            )
-
-    # Progress bar over training iterations to indicate offline training progress.
-    for itr in tqdm(range(1, max_train_iters + 1), desc="Training iterations"):
-        t1 = time.time()
-        for epoch in range(num_updates_per_iter):
-            try:
-                (
-                    timesteps,
-                    states,
-                    actions,
-                    returns_to_go,
-                    rewards,
-                    traj_mask,
-                ) = next(data_iter)
-            except StopIteration:
-                data_iter = iter(traj_data_loader)
-                (
-                    timesteps,
-                    states,
-                    actions,
-                    returns_to_go,
-                    rewards,
-                    traj_mask,
-                ) = next(data_iter)
-
-            loss = Trainer.train_step(
-                timesteps=timesteps,
-                states=states,
-                actions=actions,
-                returns_to_go=returns_to_go,
-                rewards=rewards,
-                traj_mask=traj_mask
-            )
-            if args.use_wandb:
-                wandb.log(
-                    data={
-                        "training/loss" : loss,
-                    }
-                )
-        t2 = time.time()
+    if not variant.get("online_training", False):
+        # Optional initial evaluation before any training updates.
         if evaluator is not None:
-            raw_return, normalized_d4rl_score = evaluator(model=Trainer.model)
-            t3 = time.time()
-            raw_return_list.append(raw_return)
-            normalized_d4rl_score_list.append(normalized_d4rl_score)
+            print("Running initial evaluation before training...")
+            init_raw_return, init_score = evaluator(model=Trainer.model)
+            raw_return_list.append(init_raw_return)
+            normalized_d4rl_score_list.append(init_score)
             if args.use_wandb:
                 wandb.log(
                     data={
-                        "training/time": t2 - t1,
-                        "evaluation/score": normalized_d4rl_score,
-                        "evaluation/score_normalized": normalized_d4rl_score,
-                        "evaluation/score_raw": raw_return,
-                        "evaluation/time": t3 - t2,
+                        "evaluation/score": init_score,
+                        "evaluation/score_normalized": init_score,
+                        "evaluation/score_raw": init_raw_return,
+                        "evaluation/iteration": 0,
                     }
                 )
 
-        # Simple textual indicator that offline training is progressing.
-        print(
-            f"Iteration {itr}/{max_train_iters} - "
-            f"last training loss: {loss:.4f}"
-            + (
-                f", last eval raw return: {raw_return:.2f}, "
-                f"last eval normalized score: {normalized_d4rl_score:.2f}"
-                if evaluator is not None
-                else ""
+        # Progress bar over training iterations to indicate offline training progress.
+        for itr in tqdm(range(1, max_train_iters + 1), desc="Training iterations"):
+            t1 = time.time()
+            for epoch in range(num_updates_per_iter):
+                try:
+                    (
+                        timesteps,
+                        states,
+                        actions,
+                        returns_to_go,
+                        rewards,
+                        traj_mask,
+                    ) = next(data_iter)
+                except StopIteration:
+                    data_iter = iter(traj_data_loader)
+                    (
+                        timesteps,
+                        states,
+                        actions,
+                        returns_to_go,
+                        rewards,
+                        traj_mask,
+                    ) = next(data_iter)
+
+                loss = Trainer.train_step(
+                    timesteps=timesteps,
+                    states=states,
+                    actions=actions,
+                    returns_to_go=returns_to_go,
+                    rewards=rewards,
+                    traj_mask=traj_mask
+                )
+                if args.use_wandb:
+                    wandb.log(
+                        data={
+                            "training/loss" : loss,
+                        }
+                    )
+            t2 = time.time()
+            if evaluator is not None:
+                raw_return, normalized_d4rl_score = evaluator(model=Trainer.model)
+                t3 = time.time()
+                raw_return_list.append(raw_return)
+                normalized_d4rl_score_list.append(normalized_d4rl_score)
+                if args.use_wandb:
+                    wandb.log(
+                        data={
+                            "training/time": t2 - t1,
+                            "evaluation/score": normalized_d4rl_score,
+                            "evaluation/score_normalized": normalized_d4rl_score,
+                            "evaluation/score_raw": raw_return,
+                            "evaluation/time": t3 - t2,
+                        }
+                    )
+
+            # Simple textual indicator that offline training is progressing.
+            print(
+                f"Iteration {itr}/{max_train_iters} - "
+                f"last training loss: {loss:.4f}"
+                + (
+                    f", last eval raw return: {raw_return:.2f}, "
+                    f"last eval normalized score: {normalized_d4rl_score:.2f}"
+                    if evaluator is not None
+                    else ""
+                )
             )
-        )
+    else:
+        # Online finetuning loop with advantage-weighted RL term.
+        online_buffer_size = variant.get("online_buffer_size", len(traj_dataset))
+        beta_rl = variant.get("beta_rl", 0.0)
+        adv_scale = variant.get("adv_scale", 1.0)
+
+        # Initialize buffer with top offline trajectories by return.
+        offline_returns = [
+            float(np.sum(traj["rewards"])) for traj in traj_dataset.trajectories
+        ]
+        sorted_indices = np.argsort(offline_returns)[::-1]
+        online_replay_buffer = [
+            traj_dataset.trajectories[i] for i in sorted_indices[:online_buffer_size]
+        ]
+
+        # Optionally load a pretrained model checkpoint.
+        if variant.get("pretrained_model"):
+            try:
+                state_dict = torch.load(
+                    variant["pretrained_model"], map_location=device
+                )
+                Trainer.model.load_state_dict(state_dict)
+                print(f"Loaded pretrained model from {variant['pretrained_model']}")
+            except Exception as e:
+                print(f"Warning: could not load pretrained model: {e}")
+
+        try:
+            rollout_env = gym.make(d4rl_env)
+            rollout_env.reset(seed=seed + 1 if seed is not None else None)
+        except Exception:
+            rollout_env = eval_env
+
+        for itr in tqdm(range(1, max_train_iters + 1), desc="Online iterations"):
+            # 1) Collect one rollout with stochastic policy (rsample).
+            new_traj = collect_online_trajectory(
+                model=Trainer.model,
+                env_for_rollout=rollout_env,
+                use_mean_action=False,
+            )
+            online_replay_buffer.append(new_traj)
+            if len(online_replay_buffer) > online_buffer_size:
+                online_replay_buffer.pop(0)
+
+            # 2) Train for num_updates_per_iter minibatches from buffer.
+            t1 = time.time()
+            for _ in range(num_updates_per_iter):
+                (
+                    timesteps,
+                    states,
+                    actions,
+                    returns_to_go,
+                    rewards,
+                    traj_mask,
+                ) = sample_online_batch(
+                    online_replay_buffer,
+                    batch_size=variant["batch_size"],
+                    context_len=variant["context_len"],
+                )
+
+                loss = Trainer.train_step(
+                    timesteps=timesteps,
+                    states=states,
+                    actions=actions,
+                    returns_to_go=returns_to_go,
+                    rewards=rewards,
+                    traj_mask=traj_mask,
+                    beta_rl=beta_rl,
+                    adv_scale=adv_scale,
+                )
+                if args.use_wandb:
+                    wandb.log(
+                        data={
+                            "training/loss": loss,
+                        }
+                    )
+            t2 = time.time()
+
+            # 3) Evaluate with deterministic actions.
+            if evaluator is not None:
+                raw_return, normalized_d4rl_score = evaluator(model=Trainer.model)
+                t3 = time.time()
+                raw_return_list.append(raw_return)
+                normalized_d4rl_score_list.append(normalized_d4rl_score)
+                if args.use_wandb:
+                    wandb.log(
+                        data={
+                            "training/time": t2 - t1,
+                            "evaluation/score": normalized_d4rl_score,
+                            "evaluation/score_normalized": normalized_d4rl_score,
+                            "evaluation/score_raw": raw_return,
+                            "evaluation/time": t3 - t2,
+                        }
+                    )
+
+            print(
+                f"[Online] Iteration {itr}/{max_train_iters} - "
+                f"last training loss: {loss:.4f}"
+                + (
+                    f", last eval raw return: {raw_return:.2f}, "
+                    f"last eval normalized score: {normalized_d4rl_score:.2f}"
+                    if evaluator is not None
+                    else ""
+                )
+            )
 
     if normalized_d4rl_score_list and args.use_wandb:
         wandb.log(
@@ -436,6 +773,13 @@ def experiment(variant):
         print("No online evaluation was performed (evaluation env not available).")
     print("=" * 60)
     print("finished training!")
+    # Optional checkpoint save
+    if args.save_model_path is not None:
+        try:
+            torch.save(Trainer.model.state_dict(), args.save_model_path)
+            print(f"Saved model checkpoint to {args.save_model_path}")
+        except Exception as e:
+            print(f"Warning: failed to save model checkpoint to {args.save_model_path}: {e}")
     end_time = datetime.now().replace(microsecond=0)
     end_time_str = end_time.strftime("%y-%m-%d-%H-%M-%S")
     print("finished training at: " + end_time_str)
@@ -467,6 +811,12 @@ if __name__ == "__main__":
     parser.add_argument("--device", type=str, default="cuda")
     parser.add_argument("--seed", type=int, default=2024)
     parser.add_argument("--init_temperature", type=float, default=0.1)
+    parser.add_argument("--online_training", action="store_true", default=False)
+    parser.add_argument("--online_buffer_size", type=int, default=1000)
+    parser.add_argument("--beta_rl", type=float, default=0.0, help="Weight for AWAC-style RL fine-tuning loss during online training.")
+    parser.add_argument("--adv_scale", type=float, default=1.0, help="Lambda scale for advantage weighting exp(A/lambda).")
+    parser.add_argument("--pretrained_model", type=str, default=None)
+    parser.add_argument("--save_model_path", type=str, default=None, help="Optional path to save model state_dict after training.")
     # use_wandb = False
     parser.add_argument("--use_wandb", action='store_true', default=False)
     args = parser.parse_args()
