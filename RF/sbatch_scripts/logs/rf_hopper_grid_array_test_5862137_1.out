@@ -1,0 +1,7 @@
+------------------------------------------------------------
+TEST grid | context_len=5 | n_blocks=4 | lr=1e-4 | target_entropy=1
+logs: sbatch_scripts/logs/grid_array_test/K_5/enc_4/lr_1e-4/te_1/run_5862137_1.out / sbatch_scripts/logs/grid_array_test/K_5/enc_4/lr_1e-4/te_1/run_5862137_1.err
+Array task: 1 of 2
+------------------------------------------------------------
+Sat Dec  6 22:16:48 EST 2025
+Sat Dec  6 22:46:26 EST 2025
