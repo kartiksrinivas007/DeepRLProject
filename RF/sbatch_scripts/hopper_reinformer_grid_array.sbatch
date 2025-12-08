@@ -65,7 +65,7 @@ PLOT_RUN_DIR="${PLOT_DIR}" python main.py \
   --num_eval_ep 15 \
   --max_eval_ep_len 1000 \
   --tau 0.999 \
-  --max_train_iters 15 \
+  --max_train_iters 20 \
   --context_len "${K}" \
   --n_blocks "${ENC}" \
   --lr "${LR}" \

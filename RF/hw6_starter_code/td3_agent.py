@@ -239,6 +239,102 @@ class TD3Agent:
         stats.update(cql_stats)
         return stats
 
+
+class BCAgent:
+    """
+    Pure behavior cloning agent trained on the offline buffer.
+
+    Uses the same Actor architecture as TD3Agent but *only* optimizes a
+    supervised MSE loss between the actor's mean action and the dataset
+    actions. No critics or Q-learning are involved.
+    """
+
+    def __init__(
+        self,
+        env_info,
+        offline_buffer: Buffer,
+        lr=3e-4,
+        batch_size=128,
+        update_every=1,
+        device="cpu",
+    ):
+        self.device = torch.device(device)
+
+        # Environment info
+        self.obs_dim = env_info["obs_dim"]
+        self.act_dim = env_info["act_dim"]
+        self.act_low = torch.as_tensor(
+            env_info["act_low"], dtype=torch.float32, device=self.device
+        )
+        self.act_high = torch.as_tensor(
+            env_info["act_high"], dtype=torch.float32, device=self.device
+        )
+
+        self.batch_size = batch_size
+        self.update_every = update_every
+
+        # Reuse the TD3 actor architecture (deterministic actor)
+        self.actor = Actor(
+            obs_dim=self.obs_dim,
+            act_dim=self.act_dim,
+            act_low=self.act_low,
+            act_high=self.act_high,
+            hidden=(128, 128),
+            state_independent_std=True,
+        ).to(self.device)
+
+        self.actor_opt = optim.Adam(self.actor.parameters(), lr=lr)
+
+        self._offline_buffer = offline_buffer
+        self._step_count = 0
+
+    def act(self, obs, deterministic=True):
+        """Return action info dict matching TD3's interface."""
+        with torch.no_grad():
+            obs_t = torch.as_tensor(
+                obs, dtype=torch.float32, device=self.device
+            ).unsqueeze(0)
+            dist = self.actor(obs_t)
+            action = dist.mean_action
+
+            # Clamp to environment bounds
+            action = torch.clamp(action, self.act_low, self.act_high)
+
+            return {"action": action.squeeze(0).cpu().numpy()}
+
+    def step(self) -> Dict[str, float]:
+        """
+        Perform pure behavior cloning updates on the offline buffer.
+
+        This method matches the TD3Agent.step interface: it returns a
+        dict of stats when an update occurs, and an empty dict otherwise.
+        """
+        self._step_count += 1
+
+        # Simple update scheduling: update every `update_every` calls.
+        if (self._step_count % self.update_every) != 0:
+            return {}
+
+        # Sample a batch from the offline buffer.
+        batch = self._offline_buffer.sample(self.batch_size)
+        obs = batch["obs"]
+        actions = batch["actions"]
+
+        # Predict actions and compute BC loss.
+        dist = self.actor(obs)
+        actions_pi = dist.mean_action
+
+        bc_loss = torch.mean(torch.pow(actions_pi - actions, 2).sum(dim=-1))
+
+        self.actor_opt.zero_grad()
+        bc_loss.backward()
+        self.actor_opt.step()
+
+        return {
+            "actor_loss": float(bc_loss.item()),
+            "bc_loss": float(bc_loss.item()),
+        }
+
     def _get_cql_loss(self, batch):
         """Returns the CQL loss and stats for logging"""
         obs = batch["obs"]

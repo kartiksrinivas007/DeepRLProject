@@ -1,0 +1,43 @@
+============================================================
+start time: 25-12-07-14-02-01
+============================================================
+dataset size: 1327
+returns max : 3908.8544921875
+returns mean: 2817.7890625
+returns std : 877.09326171875
+returns min : 1350.3359375
+Using Minari eval environment: Hopper-v5
+Running initial evaluation before training...
+Iteration 1/20 - last training loss: 2.6543, last eval raw return: 239.52, last eval normalized score: 7.98
+Iteration 2/20 - last training loss: 2.7034, last eval raw return: 1185.22, last eval normalized score: 37.04
+Iteration 3/20 - last training loss: 2.7450, last eval raw return: 1262.32, last eval normalized score: 39.41
+Iteration 4/20 - last training loss: 2.7741, last eval raw return: 1617.09, last eval normalized score: 50.31
+Iteration 5/20 - last training loss: 2.7976, last eval raw return: 1870.04, last eval normalized score: 58.08
+Iteration 6/20 - last training loss: 2.8091, last eval raw return: 1952.07, last eval normalized score: 60.60
+Iteration 7/20 - last training loss: 2.8116, last eval raw return: 2299.41, last eval normalized score: 71.27
+Iteration 8/20 - last training loss: 2.8159, last eval raw return: 1556.23, last eval normalized score: 48.44
+Iteration 9/20 - last training loss: 2.8228, last eval raw return: 1825.56, last eval normalized score: 56.71
+Iteration 10/20 - last training loss: 2.8206, last eval raw return: 2338.39, last eval normalized score: 72.47
+Iteration 11/20 - last training loss: 2.8222, last eval raw return: 2171.83, last eval normalized score: 67.35
+Iteration 12/20 - last training loss: 2.8217, last eval raw return: 2872.26, last eval normalized score: 88.88
+Iteration 13/20 - last training loss: 2.8202, last eval raw return: 1789.02, last eval normalized score: 55.59
+Iteration 14/20 - last training loss: 2.8163, last eval raw return: 2741.84, last eval normalized score: 84.87
+Iteration 15/20 - last training loss: 2.8227, last eval raw return: 2512.22, last eval normalized score: 77.81
+Iteration 16/20 - last training loss: 2.8204, last eval raw return: 1429.84, last eval normalized score: 44.56
+Iteration 17/20 - last training loss: 2.8162, last eval raw return: 1628.02, last eval normalized score: 50.65
+Iteration 18/20 - last training loss: 2.8155, last eval raw return: 1343.31, last eval normalized score: 41.90
+Iteration 19/20 - last training loss: 2.8170, last eval raw return: 1463.24, last eval normalized score: 45.58
+Iteration 20/20 - last training loss: 2.8149, last eval raw return: 1516.28, last eval normalized score: 47.21
+Evaluation scores over iterations: [1.08389846508628, 7.98230874147379, 37.03987194536998, 39.408941801598296, 50.309459941029644, 58.081666046784505, 60.602249109080596, 71.27457162200147, 48.43953599615464, 56.714987181414955, 72.47215331970139, 67.35467105477554, 88.87596814581907, 55.59243746184107, 84.86878342015618, 77.8135040470241, 44.556089156561654, 50.64528375974605, 41.897298429922394, 45.582439356399526, 47.212249049862976]
+Raw returns over iterations: [15.00395425901816, 239.51770459960002, 1185.2171091414764, 1262.3202005683863, 1617.0854450358202, 1870.037512441237, 1952.0717107112464, 2299.410163517049, 1556.227418201355, 1825.5579605906314, 2338.38632578014, 2171.8341652725762, 2872.2603400744497, 1789.0237683075245, 2741.843615782835, 2512.2244472645007, 1429.8378328805638, 1628.0150740333577, 1343.3055662434542, 1463.2411422367993, 1516.284477144466]
+Saved raw return evaluation plot to sbatch_scripts/logs/grid_array/K_20/enc_4/lr_1e-4/te_-3/plots/hopper-medium-v2_eval_raw_return_25-12-07-14-02-01.png
+Saved normalized evaluation plot to sbatch_scripts/logs/grid_array/K_20/enc_4/lr_1e-4/te_-3/plots/hopper-medium-v2_eval_25-12-07-14-02-01.png
+============================================================
+finished training!
+finished training at: 25-12-07-15-10-45
+============================================================
+All plots for this run saved under: sbatch_scripts/logs/grid_array/K_20/enc_4/lr_1e-4/te_-3/plots
+Saved per-iteration training loss plot to sbatch_scripts/logs/grid_array/K_20/enc_4/lr_1e-4/te_-3/plots/hopper-medium-v2_training_losses_25-12-07-14-02-01.png
+Saved per-iteration training stats plot to sbatch_scripts/logs/grid_array/K_20/enc_4/lr_1e-4/te_-3/plots/hopper-medium-v2_training_stats_25-12-07-14-02-01.png
+Saved per-update training loss plot to sbatch_scripts/logs/grid_array/K_20/enc_4/lr_1e-4/te_-3/plots/hopper-medium-v2_training_losses_steps_25-12-07-14-02-01.png
+Saved per-update training stats plot to sbatch_scripts/logs/grid_array/K_20/enc_4/lr_1e-4/te_-3/plots/hopper-medium-v2_training_stats_steps_25-12-07-14-02-01.png

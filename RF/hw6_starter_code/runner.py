@@ -7,7 +7,7 @@ import numpy as np
 import torch
 import gymnasium as gym
 from minari.utils import get_normalized_score as minari_get_normalized_score
-from td3_agent import TD3Agent
+from td3_agent import TD3Agent, BCAgent
 from utils import (
     evaluate_policy,
     record_eval_video,
@@ -36,9 +36,20 @@ def create_agent(agent_type, env_info, offline_buffer, args, device):
             cql_temp=args.cql_temp,
             device=device,
         )
+    elif agent_type.lower() == "bc":
+        # Pure behavior cloning using the same Actor architecture
+        # as TD3Agent but without any critics or RL updates.
+        return BCAgent(
+            env_info=env_info,
+            offline_buffer=offline_buffer,
+            lr=args.lr,
+            batch_size=args.batch_size,
+            update_every=args.update_every,
+            device=device,
+        )
     else:
         raise ValueError(
-            f"Unknown agent type: {agent_type}. Choose 'ppo', 'sac', or 'td3'"
+            f"Unknown agent type: {agent_type}. Choose 'ppo', 'sac', 'td3', or 'bc'"
         )
 
 
@@ -80,6 +91,13 @@ def initialize_log(agent_type):
                 "cql_current_actions": [],
                 "in_distribution_q_pred": [],
                 "cql_random_actions": [],
+            }
+        )
+    elif agent_type.lower() == "bc":
+        base_log.update(
+            {
+                "actor_loss": [],
+                "bc_loss": [],
             }
         )
 
@@ -197,6 +215,14 @@ def log_training_stats(agent_type, stats, log, total_steps, updates_performed):
                 f"in_distribution_q_pred: {stats['in_distribution_q_pred']:.4f} | "
                 f"cql_random_actions: {stats['cql_random_actions']:.4f}"
             )
+    elif agent_type.lower() == "bc":
+        print(
+            f"[Step {total_steps:>8d}] "
+            f"Updates: {updates_performed:>4d} | "
+            f"Actor: {log['actor_loss'][-1]:>7.4f} | "
+            f"BC: {log['bc_loss'][-1]:>7.4f} | "
+            f"Ret: {avg_return:>7.1f}"
+        )
 
 
 def create_transition(

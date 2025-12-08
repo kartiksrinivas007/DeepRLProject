@@ -20,6 +20,11 @@ class ReinFormerTrainer:
         self.device = device
         self.grad_norm = variant["grad_norm"]
 
+        # Allow overriding the default target entropy (-act_dim) via variant.
+        target_entropy = variant.get("target_entropy", None)
+        if target_entropy is None:
+            target_entropy = -self.act_dim
+
         self.model = ReinFormer(
             state_dim=state_dim,
             act_dim=act_dim,
@@ -29,7 +34,7 @@ class ReinFormerTrainer:
             n_heads=variant["n_heads"],
             drop_p=variant["dropout_p"],
             init_temperature=variant["init_temperature"],
-            target_entropy=variant.get("target_entropy", -self.act_dim),
+            target_entropy=target_entropy,
         ).to(self.device)
 
         self.optimizer = Lamb(
@@ -65,6 +70,7 @@ class ReinFormerTrainer:
         beta_rl: float = 0.0,
         adv_scale: float = 1.0,
     ):
+
         self.model.train()
         # data to gpu ------------------------------------------------
         timesteps = timesteps.to(self.device)      # B x T
@@ -132,9 +138,18 @@ class ReinFormerTrainer:
         # optimization -----------------------------------------------
         self.optimizer.zero_grad()
         loss.backward()
+
+        # gradient norm (before clipping) for diagnostics
+        total_norm = 0.0
+        for p in self.model.parameters():
+            if p.grad is not None:
+                param_norm = p.grad.data.norm(2)
+                total_norm += param_norm.item() ** 2
+        total_norm = total_norm ** 0.5
+
         torch.nn.utils.clip_grad_norm_(
-            self.model.parameters(), 
-            self.grad_norm
+            self.model.parameters(),
+            self.grad_norm,
         )
         self.optimizer.step()
 
@@ -147,4 +162,15 @@ class ReinFormerTrainer:
 
         self.scheduler.step()
 
-        return loss.detach().cpu().item()
+        # Return total loss plus useful diagnostics for logging/plotting.
+        return (
+            loss.detach().cpu().item(),
+            {
+                "returns_to_go_loss": returns_to_go_loss.detach().cpu().item(),
+                "action_loss": action_loss.detach().cpu().item(),
+                "temperature_loss": temperature_loss.detach().cpu().item(),
+                "entropy": entropy.detach().cpu().item(),
+                "temperature": self.model.temperature().detach().cpu().item(),
+                "grad_norm": float(total_norm),
+            },
+        )

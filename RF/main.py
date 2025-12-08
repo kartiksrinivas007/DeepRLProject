@@ -84,6 +84,23 @@ def experiment(variant):
 
     start_time = datetime.now().replace(microsecond=0)
     start_time_str = start_time.strftime("%y-%m-%d-%H-%M-%S")
+    # Per-run plot directory to avoid overwriting plots across runs.
+    # Prefer an explicit directory provided via environment variable
+    # (e.g., set by Slurm scripts to mirror log structure), otherwise
+    # fall back to a job-based directory under RF/plots.
+    plot_run_dir_env = os.environ.get("PLOT_RUN_DIR")
+    if plot_run_dir_env:
+        plot_run_dir = plot_run_dir_env
+    else:
+        slurm_job_id = os.environ.get("SLURM_ARRAY_JOB_ID") or os.environ.get(
+            "SLURM_JOB_ID"
+        )
+        if slurm_job_id:
+            plot_run_dir = os.path.join(
+                "plots", f"{d4rl_env}_job{slurm_job_id}_{start_time_str}"
+            )
+        else:
+            plot_run_dir = os.path.join("plots", f"{d4rl_env}_{start_time_str}")
 
     print("=" * 60)
     print("start time: " + start_time_str)
@@ -530,77 +547,86 @@ def experiment(variant):
     normalized_d4rl_score_list = []
     raw_return_list = []
 
-    if not variant.get("online_training", False):
-        # Optional initial evaluation before any training updates.
-        if evaluator is not None:
-            print("Running initial evaluation before training...")
-            init_raw_return, init_score = evaluator(model=Trainer.model)
-            raw_return_list.append(init_raw_return)
-            normalized_d4rl_score_list.append(init_score)
+    # Optional initial evaluation before any training updates.
+    if evaluator is not None:
+        print("Running initial evaluation before training...")
+        init_raw_return, init_score = evaluator(model=Trainer.model)
+        raw_return_list.append(init_raw_return)
+        normalized_d4rl_score_list.append(init_score)
+        if args.use_wandb:
+            wandb.log(
+                data={
+                    "evaluation/score": init_score,
+                    "evaluation/score_normalized": init_score,
+                    "evaluation/score_raw": init_raw_return,
+                    "evaluation/iteration": 0,
+                }
+            )
+
+    # Progress bar over training iterations to indicate offline training progress.
+    for itr in tqdm(range(1, max_train_iters + 1), desc="Training iterations"):
+        t1 = time.time()
+        # accumulate per-iteration training diagnostics
+        total_loss_sum = 0.0
+        rtg_loss_sum = 0.0
+        action_loss_sum = 0.0
+        temperature_loss_sum = 0.0
+        entropy_sum = 0.0
+        temperature_sum = 0.0
+        grad_norm_sum = 0.0
+        num_updates = 0
+
+        for epoch in range(num_updates_per_iter):
+            try:
+                (
+                    timesteps,
+                    states,
+                    actions,
+                    returns_to_go,
+                    rewards,
+                    traj_mask,
+                ) = next(data_iter)
+            except StopIteration:
+                data_iter = iter(traj_data_loader)
+                (
+                    timesteps,
+                    states,
+                    actions,
+                    returns_to_go,
+                    rewards,
+                    traj_mask,
+                ) = next(data_iter)
+
+            loss = Trainer.train_step(
+                timesteps=timesteps,
+                states=states,
+                actions=actions,
+                returns_to_go=returns_to_go,
+                rewards=rewards,
+                traj_mask=traj_mask
+            )
             if args.use_wandb:
                 wandb.log(
                     data={
-                        "evaluation/score": init_score,
-                        "evaluation/score_normalized": init_score,
-                        "evaluation/score_raw": init_raw_return,
-                        "evaluation/iteration": 0,
+                        "training/loss" : loss,
                     }
                 )
-
-        # Progress bar over training iterations to indicate offline training progress.
-        for itr in tqdm(range(1, max_train_iters + 1), desc="Training iterations"):
-            t1 = time.time()
-            for epoch in range(num_updates_per_iter):
-                try:
-                    (
-                        timesteps,
-                        states,
-                        actions,
-                        returns_to_go,
-                        rewards,
-                        traj_mask,
-                    ) = next(data_iter)
-                except StopIteration:
-                    data_iter = iter(traj_data_loader)
-                    (
-                        timesteps,
-                        states,
-                        actions,
-                        returns_to_go,
-                        rewards,
-                        traj_mask,
-                    ) = next(data_iter)
-
-                loss = Trainer.train_step(
-                    timesteps=timesteps,
-                    states=states,
-                    actions=actions,
-                    returns_to_go=returns_to_go,
-                    rewards=rewards,
-                    traj_mask=traj_mask
+        t2 = time.time()
+        if evaluator is not None:
+            raw_return, normalized_d4rl_score = evaluator(model=Trainer.model)
+            t3 = time.time()
+            raw_return_list.append(raw_return)
+            normalized_d4rl_score_list.append(normalized_d4rl_score)
+            if args.use_wandb:
+                wandb.log(
+                    data={
+                        "training/time": t2 - t1,
+                        "evaluation/score": normalized_d4rl_score,
+                        "evaluation/score_normalized": normalized_d4rl_score,
+                        "evaluation/score_raw": raw_return,
+                        "evaluation/time": t3 - t2,
+                    }
                 )
-                if args.use_wandb:
-                    wandb.log(
-                        data={
-                            "training/loss" : loss,
-                        }
-                    )
-            t2 = time.time()
-            if evaluator is not None:
-                raw_return, normalized_d4rl_score = evaluator(model=Trainer.model)
-                t3 = time.time()
-                raw_return_list.append(raw_return)
-                normalized_d4rl_score_list.append(normalized_d4rl_score)
-                if args.use_wandb:
-                    wandb.log(
-                        data={
-                            "training/time": t2 - t1,
-                            "evaluation/score": normalized_d4rl_score,
-                            "evaluation/score_normalized": normalized_d4rl_score,
-                            "evaluation/score_raw": raw_return,
-                            "evaluation/time": t3 - t2,
-                        }
-                    )
 
             # Simple textual indicator that offline training is progressing.
             print(
@@ -733,10 +759,10 @@ def experiment(variant):
 
         # Plot evaluation curves if matplotlib is available.
         if plt is not None:
-            os.makedirs("plots", exist_ok=True)
+            os.makedirs(plot_run_dir, exist_ok=True)
             # Use start_time_str to avoid overwriting previous runs.
             plot_path_norm = os.path.join(
-                "plots", f"{d4rl_env}_eval_{start_time_str}.png"
+                plot_run_dir, f"{d4rl_env}_eval_{start_time_str}.png"
             )
             plt.figure()
             plt.plot(normalized_d4rl_score_list, marker="o")
@@ -751,7 +777,7 @@ def experiment(variant):
             # Raw return plot.
             if raw_return_list:
                 plot_path_raw = os.path.join(
-                    "plots", f"{d4rl_env}_eval_raw_return_{start_time_str}.png"
+                    plot_run_dir, f"{d4rl_env}_eval_raw_return_{start_time_str}.png"
                 )
                 plt.figure()
                 plt.plot(raw_return_list, marker="o")
@@ -785,6 +811,131 @@ def experiment(variant):
     print("finished training at: " + end_time_str)
     print("=" * 60)
 
+    # Final summary of plot directory for Slurm logs.
+    print(f"All plots for this run saved under: {plot_run_dir}")
+
+    # Plot training diagnostics: coarse per-iteration and fine-grained per-update.
+    if plt is not None:
+        os.makedirs(plot_run_dir, exist_ok=True)
+
+        # Per-iteration summary (as before).
+        if training_loss_list:
+            iter_steps = list(range(1, len(training_loss_list) + 1))
+
+            loss_plot_path = os.path.join(
+                plot_run_dir, f"{d4rl_env}_training_losses_{start_time_str}.png"
+            )
+            plt.figure()
+            plt.plot(iter_steps, training_loss_list, label="total_loss")
+            if rtg_loss_list:
+                plt.plot(iter_steps, rtg_loss_list, label="returns_to_go_loss")
+            if action_loss_list:
+                plt.plot(iter_steps, action_loss_list, label="action_loss")
+            if temperature_loss_list:
+                plt.plot(
+                    iter_steps, temperature_loss_list, label="temperature_loss"
+                )
+            plt.xlabel("Training iteration")
+            plt.ylabel("Loss")
+            plt.title(f"Training losses (per-iteration) - {eval_env_id or d4rl_env}")
+            plt.grid(True)
+            plt.legend()
+            plt.tight_layout()
+            plt.savefig(loss_plot_path)
+            plt.close()
+            print(f"Saved per-iteration training loss plot to {loss_plot_path}")
+
+            stats_plot_path = os.path.join(
+                plot_run_dir, f"{d4rl_env}_training_stats_{start_time_str}.png"
+            )
+            plt.figure()
+            if entropy_list:
+                plt.plot(iter_steps, entropy_list, label="policy_entropy")
+            if temperature_list:
+                plt.plot(iter_steps, temperature_list, label="temperature")
+            if grad_norm_list:
+                plt.plot(iter_steps, grad_norm_list, label="grad_norm")
+            plt.xlabel("Training iteration")
+            plt.ylabel("Value")
+            plt.title(
+                f"Training stats (per-iteration) - {eval_env_id or d4rl_env}"
+            )
+            plt.grid(True)
+            plt.legend()
+            plt.tight_layout()
+            plt.savefig(stats_plot_path)
+            plt.close()
+            print(f"Saved per-iteration training stats plot to {stats_plot_path}")
+
+        # Fine-grained per-update moving-average view.
+        if step_loss_list:
+            # Use a window such that we get ~200 MA points.
+            n_steps = len(step_loss_list)
+            window = max(1, n_steps // 200)
+
+            def moving_average(xs):
+                xs_arr = np.asarray(xs, dtype=float)
+                if xs_arr.shape[0] < window:
+                    return xs_arr, np.arange(1, xs_arr.shape[0] + 1)
+                ma = np.convolve(xs_arr, np.ones(window) / window, mode="valid")
+                x = np.arange(window, window + ma.shape[0])
+                return ma, x
+
+            loss_ma, x_loss = moving_average(step_loss_list)
+            rtg_ma, x_rtg = moving_average(step_rtg_loss_list) if step_rtg_loss_list else (None, None)
+            act_ma, x_act = moving_average(step_action_loss_list) if step_action_loss_list else (None, None)
+            temp_ma, x_temp = moving_average(step_temperature_loss_list) if step_temperature_loss_list else (None, None)
+
+            fine_loss_plot_path = os.path.join(
+                plot_run_dir, f"{d4rl_env}_training_losses_steps_{start_time_str}.png"
+            )
+            plt.figure()
+            plt.plot(x_loss, loss_ma, label=f"total_loss_MA(w={window})")
+            if rtg_ma is not None:
+                plt.plot(x_rtg, rtg_ma, label="returns_to_go_loss_MA")
+            if act_ma is not None:
+                plt.plot(x_act, act_ma, label="action_loss_MA")
+            if temp_ma is not None:
+                plt.plot(x_temp, temp_ma, label="temperature_loss_MA")
+            plt.xlabel("Update step")
+            plt.ylabel("Loss (moving average)")
+            plt.title(
+                f"Training losses (per-update MA) - {eval_env_id or d4rl_env}"
+            )
+            plt.grid(True)
+            plt.legend()
+            plt.tight_layout()
+            plt.savefig(fine_loss_plot_path)
+            plt.close()
+            print(f"Saved per-update training loss plot to {fine_loss_plot_path}")
+
+            # Policy stats: entropy, temperature, grad_norm moving averages.
+            ent_ma, x_ent = moving_average(step_entropy_list) if step_entropy_list else (None, None)
+            temp_val_ma, x_temp_val = moving_average(step_temperature_value_list) if step_temperature_value_list else (None, None)
+            grad_ma, x_grad = moving_average(step_grad_norm_list) if step_grad_norm_list else (None, None)
+
+            fine_stats_plot_path = os.path.join(
+                plot_run_dir, f"{d4rl_env}_training_stats_steps_{start_time_str}.png"
+            )
+            plt.figure()
+            if ent_ma is not None:
+                plt.plot(x_ent, ent_ma, label="policy_entropy_MA")
+            if temp_val_ma is not None:
+                plt.plot(x_temp_val, temp_val_ma, label="temperature_MA")
+            if grad_ma is not None:
+                plt.plot(x_grad, grad_ma, label="grad_norm_MA")
+            plt.xlabel("Update step")
+            plt.ylabel("Value (moving average)")
+            plt.title(
+                f"Training stats (per-update MA) - {eval_env_id or d4rl_env}"
+            )
+            plt.grid(True)
+            plt.legend()
+            plt.tight_layout()
+            plt.savefig(fine_stats_plot_path)
+            plt.close()
+            print(f"Saved per-update training stats plot to {fine_stats_plot_path}")
+
 
 if __name__ == "__main__":
 
@@ -811,13 +962,6 @@ if __name__ == "__main__":
     parser.add_argument("--device", type=str, default="cuda")
     parser.add_argument("--seed", type=int, default=2024)
     parser.add_argument("--init_temperature", type=float, default=0.1)
-    parser.add_argument("--online_training", action="store_true", default=False)
-    parser.add_argument("--online_buffer_size", type=int, default=1000)
-    parser.add_argument("--beta_rl", type=float, default=0.0, help="Weight for AWAC-style RL fine-tuning loss during online training.")
-    parser.add_argument("--adv_scale", type=float, default=1.0, help="Lambda scale for advantage weighting exp(A/lambda).")
-    parser.add_argument("--pretrained_model", type=str, default=None)
-    parser.add_argument("--save_model_path", type=str, default=None, help="Optional path to save model state_dict after training.")
-    parser.add_argument("--target_entropy", type=float, default=None, help="Optional target entropy for the stochastic policy; defaults to -action_dim when unset.")
     # use_wandb = False
     parser.add_argument("--use_wandb", action='store_true', default=False)
     args = parser.parse_args()

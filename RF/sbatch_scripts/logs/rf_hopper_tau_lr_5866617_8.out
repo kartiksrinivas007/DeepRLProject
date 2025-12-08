@@ -1,0 +1,7 @@
+------------------------------------------------------------
+Hopper-medium sweep | context_len=20 | n_blocks=6 | tau=0.99 | lr=4e-4 | target_entropy=-3
+logs: sbatch_scripts/logs/tau_lr/K_20/enc_6/tau_0.99/lr_4e-4/run_5866617_8.out / sbatch_scripts/logs/tau_lr/K_20/enc_6/tau_0.99/lr_4e-4/run_5866617_8.err
+plots dir: sbatch_scripts/logs/tau_lr/K_20/enc_6/tau_0.99/lr_4e-4/plots
+Array task: 8 of 9
+------------------------------------------------------------
+Mon Dec  8 11:03:04 EST 2025
