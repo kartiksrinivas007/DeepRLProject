@@ -414,7 +414,18 @@ def experiment(
 
     if model_type == 'dt':
         if variant['pretrained_model']:
-            model = torch.load(variant['pretrained_model'],map_location='cuda:0')
+            # Torch 2.6 defaults weights_only=True; the pretrained DT checkpoints
+            # are full objects, so explicitly allow loading the class.
+            try:
+                torch.serialization.add_safe_globals([DecisionTransformer])
+            except Exception:
+                # Older torch versions may not have add_safe_globals; fallback works with weights_only=False.
+                pass
+            model = torch.load(
+                variant['pretrained_model'],
+                map_location=device,
+                weights_only=False,
+            )
             model.stochastic_tanh = variant['stochastic_tanh']
             model.approximate_entropy_samples = variant['approximate_entropy_samples']
             model.to(device)
