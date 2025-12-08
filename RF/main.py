@@ -792,7 +792,7 @@ if __name__ == "__main__":
     parser.add_argument("--model_type", choices=[ "reinformer"], default="reinformer")
     parser.add_argument("--env", type=str, default="antmaze")
     parser.add_argument("--dataset", type=str, default="medium-diverse")
-    parser.add_argument("--num_eval_ep", type=int, default=10)
+    parser.add_argument("--num_eval_ep", type=int, default=30)
     parser.add_argument("--max_eval_ep_len", type=int, default=1000)
     parser.add_argument("--dataset_dir", type=str, default="data/d4rl_dataset/")
     parser.add_argument("--context_len", type=int, default=5)
