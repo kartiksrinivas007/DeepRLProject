@@ -29,7 +29,7 @@ class ReinFormerTrainer:
             n_heads=variant["n_heads"],
             drop_p=variant["dropout_p"],
             init_temperature=variant["init_temperature"],
-            target_entropy=-self.act_dim
+            target_entropy=variant.get("target_entropy", -self.act_dim),
         ).to(self.device)
 
         self.optimizer = Lamb(

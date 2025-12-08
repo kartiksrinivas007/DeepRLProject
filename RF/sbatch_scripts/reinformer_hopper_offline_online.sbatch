@@ -27,11 +27,12 @@ python main.py \
   --env hopper \
   --dataset medium \
   --dataset_dir data/d4rl_dataset/ \
-  --max_train_iters 10 \
+  --max_train_iters 15 \
   --num_updates_per_iter 5000 \
   --num_eval_ep 10 \
   --max_eval_ep_len 1000 \
   --tau 0.999 \
+  --target_entropy 3 \
   --save_model_path "models/reinformer_hopper_medium_offline.pt"
 
 echo "Running online finetuning (50k updates) starting from fresh model (no checkpoint save in main.py)"
@@ -50,7 +51,8 @@ python main.py \
   --num_updates_per_iter 5000 \
   --num_eval_ep 10 \
   --max_eval_ep_len 1000 \
-  --tau 0.999
+  --tau 0.999 \
+  --target_entropy 3
 
 date
 echo "Finished offline + online Reinformer run."

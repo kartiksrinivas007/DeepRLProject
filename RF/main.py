@@ -817,6 +817,7 @@ if __name__ == "__main__":
     parser.add_argument("--adv_scale", type=float, default=1.0, help="Lambda scale for advantage weighting exp(A/lambda).")
     parser.add_argument("--pretrained_model", type=str, default=None)
     parser.add_argument("--save_model_path", type=str, default=None, help="Optional path to save model state_dict after training.")
+    parser.add_argument("--target_entropy", type=float, default=None, help="Optional target entropy for the stochastic policy; defaults to -action_dim when unset.")
     # use_wandb = False
     parser.add_argument("--use_wandb", action='store_true', default=False)
     args = parser.parse_args()
