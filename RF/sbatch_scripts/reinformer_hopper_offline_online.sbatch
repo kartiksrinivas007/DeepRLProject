@@ -17,7 +17,7 @@
 set -euo pipefail
 
 cd "$SLURM_SUBMIT_DIR/.."
-mkdir -p logs
+mkdir -p logs models
 
 echo "Running offline Reinformer (Hopper-medium) on $(hostname)"
 date

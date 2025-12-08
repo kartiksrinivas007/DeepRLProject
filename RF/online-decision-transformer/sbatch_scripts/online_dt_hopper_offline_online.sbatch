@@ -16,10 +16,12 @@
 
 set -euo pipefail
 
-cd "$SLURM_SUBMIT_DIR/.."
-mkdir -p logs
+# Ensure Slurm log directory (relative to submit dir) exists for --output/--error.
+mkdir -p "$SLURM_SUBMIT_DIR/logs"
 
-cd online-decision-transformer/gym
+# Move to project root (…/RF/online-decision-transformer) and into gym dir.
+cd "$SLURM_SUBMIT_DIR/.."
+cd gym
 
 echo "Running offline DT (Hopper-medium) on $(hostname)"
 date
