@@ -53,9 +53,9 @@ python experiment.py \
   --model_type dt \
   --online_training \
   --pretrained_model "${latest_ckpt}" \
-  --max_iters 5 \
-  --num_steps_per_iter 10000 \
-  --num_eval_episodes 50 \
+  --max_iters 100 \
+  --num_steps_per_iter 300 \
+  --num_eval_episodes 10 \
   --device cuda
 
 date

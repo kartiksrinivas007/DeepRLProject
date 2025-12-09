@@ -123,14 +123,21 @@ class ReinFormerTrainer:
         entropy = actions_dist_preds.entropy().sum(axis=2).mean()
         action_loss = -(log_likelihood + self.model.temperature().detach() * entropy)
 
+        # Advantage-weighted RL term (AWAC-style) -------------------
+        adv_norm = None
+        weights = None
         rl_loss = torch.tensor(0.0, device=self.device)
         if beta_rl > 0.0:
-            # Advantage-weighted policy improvement (AWAC-style).
-            adv = returns_to_go_target - returns_to_go_preds.detach()
-            weights = torch.exp(adv / max(adv_scale, 1e-6))
+            # (a) raw advantage from RTG predictions
+            adv_raw = returns_to_go_target - returns_to_go_preds.detach()
+            # (b) normalize advantage
+            adv_norm = (adv_raw - adv_raw.mean()) / (adv_raw.std() + 1e-8)
+            # (c) scale by a temperature λ (adv_scale) and clip
+            scaled = (adv_norm / max(adv_scale, 1e-6)).clamp(min=-10, max=10)
+            # (d) exponentiate and clip importance weights
+            weights = torch.exp(scaled).clamp(max=20.0)
             rl_loss = -(
-                weights.view(-1)[traj_mask.view(-1,) > 0]
-                * log_prob_all.view(-1)[traj_mask.view(-1,) > 0]
+                weights.view(-1) * log_prob_all.view(-1)[traj_mask.view(-1,) > 0]
             ).mean()
 
         loss = returns_to_go_loss + action_loss + beta_rl * rl_loss
@@ -151,6 +158,13 @@ class ReinFormerTrainer:
             self.model.parameters(),
             self.grad_norm,
         )
+        total_norm = 0.0
+        for p in self.model.parameters():
+            if p.grad is not None:
+                param_norm = p.grad.data.norm(2)
+                total_norm += param_norm.item() ** 2
+        total_norm = total_norm ** 0.5
+
         self.optimizer.step()
 
         self.log_temperature_optimizer.zero_grad()
@@ -162,16 +176,35 @@ class ReinFormerTrainer:
 
         self.scheduler.step()
 
-        # Return total loss plus useful diagnostics for logging/plotting.
+        # Diagnostics for logging/analysis.
+        adv_mean = adv_std = adv_max = adv_min = None
+        weights_mean = weights_max = None
+        if adv_norm is not None and adv_norm.numel() > 0:
+            flat_adv = adv_norm.view(-1)
+            adv_mean = flat_adv.mean().detach().cpu().item()
+            adv_std = flat_adv.std(unbiased=False).detach().cpu().item()
+            adv_max = flat_adv.max().detach().cpu().item()
+            adv_min = flat_adv.min().detach().cpu().item()
+        if weights is not None and weights.numel() > 0:
+            flat_w = weights.view(-1)
+            weights_mean = flat_w.mean().detach().cpu().item()
+            weights_max = flat_w.max().detach().cpu().item()
+
         return (
             loss.detach().cpu().item(),
             {
                 "returns_to_go_loss": returns_to_go_loss.detach().cpu().item(),
                 "action_loss": action_loss.detach().cpu().item(),
                 "temperature_loss": temperature_loss.detach().cpu().item(),
-                "rl_loss": rl_loss.detach().cpu().item(),
                 "entropy": entropy.detach().cpu().item(),
                 "temperature": self.model.temperature().detach().cpu().item(),
                 "grad_norm": float(total_norm),
+                "rl_loss": rl_loss.detach().cpu().item(),
+                "adv_mean": adv_mean,
+                "adv_std": adv_std,
+                "adv_max": adv_max,
+                "adv_min": adv_min,
+                "weights_mean": weights_mean,
+                "weights_max": weights_max,
             },
         )

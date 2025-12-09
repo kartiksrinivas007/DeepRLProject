@@ -628,6 +628,9 @@ def experiment(
                 "plots",
             )
             os.makedirs(plots_dir, exist_ok=True)
+            # Use the experiment prefix (which already includes a random id)
+            # to make plot filenames unique per run.
+            plot_id = exp_prefix
             steps = None
             for tar, vals in eval_return_history.items():
                 if steps is None:
@@ -649,7 +652,7 @@ def experiment(
             plt.tight_layout()
             plot_path_raw = os.path.join(
                 plots_dir,
-                f"{model_type}_{env_name}-{dataset}_eval_returns_raw.png",
+                f"{plot_id}_{model_type}_{env_name}-{dataset}_eval_returns_raw.png",
             )
             plt.savefig(plot_path_raw)
             plt.close()
@@ -670,7 +673,7 @@ def experiment(
                 plt.tight_layout()
                 plot_path_norm = os.path.join(
                     plots_dir,
-                    f"{model_type}_{env_name}-{dataset}_eval_returns_normalized.png",
+                    f"{plot_id}_{model_type}_{env_name}-{dataset}_eval_returns_normalized.png",
                 )
                 plt.savefig(plot_path_norm)
                 plt.close()
