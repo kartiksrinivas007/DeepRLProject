@@ -85,6 +85,30 @@ def experiment(variant):
     start_time = datetime.now().replace(microsecond=0)
     start_time_str = start_time.strftime("%y-%m-%d-%H-%M-%S")
 
+    # Per-run plot directory to avoid overwriting plots and to encode settings.
+    plot_run_dir_env = os.environ.get("PLOT_RUN_DIR")
+    if plot_run_dir_env:
+        plot_run_dir = plot_run_dir_env
+    else:
+        # Use a simple convention: offline vs online, optional beta/adv, and job id.
+        slurm_job_id = os.environ.get("SLURM_ARRAY_JOB_ID") or os.environ.get(
+            "SLURM_JOB_ID"
+        )
+        if variant.get("online_training", False):
+            beta_rl = variant.get("beta_rl", 0.0)
+            adv_scale = variant.get("adv_scale", 1.0)
+            subdir = os.path.join(
+                "online",
+                f"beta_{beta_rl}_adv_{adv_scale}",
+            )
+        else:
+            subdir = "offline"
+
+        if slurm_job_id:
+            plot_run_dir = os.path.join("plots", subdir, f"job_{slurm_job_id}")
+        else:
+            plot_run_dir = os.path.join("plots", subdir, start_time_str)
+
     print("=" * 60)
     print("start time: " + start_time_str)
     print("=" * 60)
@@ -530,6 +554,19 @@ def experiment(variant):
     normalized_d4rl_score_list = []
     raw_return_list = []
 
+    # Global gradient-update counter (for throttled logging).
+    global_update_step = 0
+
+    # Per-iteration training diagnostics for plotting.
+    training_loss_list = []
+    rtg_loss_list = []
+    action_loss_list = []
+    temperature_loss_list = []
+    entropy_list = []
+    temperature_list = []
+    grad_norm_list = []
+    rl_loss_list = []
+
     if not variant.get("online_training", False):
         # Optional initial evaluation before any training updates.
         if evaluator is not None:
@@ -550,6 +587,17 @@ def experiment(variant):
         # Progress bar over training iterations to indicate offline training progress.
         for itr in tqdm(range(1, max_train_iters + 1), desc="Training iterations"):
             t1 = time.time()
+            # accumulate per-iteration diagnostics
+            total_loss_sum = 0.0
+            rtg_loss_sum = 0.0
+            action_loss_sum = 0.0
+            temperature_loss_sum = 0.0
+            entropy_sum = 0.0
+            temperature_sum = 0.0
+            grad_norm_sum = 0.0
+            rl_loss_sum = 0.0
+            num_updates = 0
+
             for epoch in range(num_updates_per_iter):
                 try:
                     (
@@ -571,7 +619,7 @@ def experiment(variant):
                         traj_mask,
                     ) = next(data_iter)
 
-                loss = Trainer.train_step(
+                loss, diag = Trainer.train_step(
                     timesteps=timesteps,
                     states=states,
                     actions=actions,
@@ -579,13 +627,70 @@ def experiment(variant):
                     rewards=rewards,
                     traj_mask=traj_mask
                 )
-                if args.use_wandb:
-                    wandb.log(
-                        data={
-                            "training/loss" : loss,
-                        }
+                global_update_step += 1
+                # Simple stdout diagnostics every 200 steps (no wandb needed).
+                if global_update_step % 200 == 0:
+                    print(
+                        f"[Offline step {global_update_step}] "
+                        f"loss={loss:.4f}, rtg_loss={diag['returns_to_go_loss']:.4f}, "
+                        f"action_loss={diag['action_loss']:.4f}, "
+                        f"temp_loss={diag['temperature_loss']:.4f}, "
+                        f"entropy={diag['entropy']:.4f}, "
+                        f"temp={diag['temperature']:.4f}, "
+                        f"grad_norm={diag['grad_norm']:.4f}, "
+                        f"adv_mean={diag['adv_mean']}, "
+                        f"adv_std={diag['adv_std']}, "
+                        f"weights_mean={diag['weights_mean']}, "
+                        f"weights_max={diag['weights_max']}"
                     )
+                if args.use_wandb:
+                    # Always log total loss; detailed stats every 200 steps.
+                    log_data = {"training/loss": loss}
+                    if global_update_step % 200 == 0:
+                        log_data.update(
+                            {
+                                "training/returns_to_go_loss": diag["returns_to_go_loss"],
+                                "training/action_loss": diag["action_loss"],
+                                "training/temperature_loss": diag["temperature_loss"],
+                                "training/entropy": diag["entropy"],
+                                "training/temperature": diag["temperature"],
+                                "training/grad_norm": diag["grad_norm"],
+                            }
+                        )
+                        if diag.get("adv_mean") is not None:
+                            log_data["training/adv_mean"] = diag["adv_mean"]
+                            log_data["training/adv_std"] = diag["adv_std"]
+                            log_data["training/adv_max"] = diag["adv_max"]
+                            log_data["training/adv_min"] = diag["adv_min"]
+                        if diag.get("weights_mean") is not None:
+                            log_data["training/weights_mean"] = diag["weights_mean"]
+                            log_data["training/weights_max"] = diag["weights_max"]
+
+                    wandb.log(data=log_data)
+
+                # accumulate per-iteration sums
+                total_loss_sum += loss
+                rtg_loss_sum += diag["returns_to_go_loss"]
+                action_loss_sum += diag["action_loss"]
+                temperature_loss_sum += diag["temperature_loss"]
+                entropy_sum += diag["entropy"]
+                temperature_sum += diag["temperature"]
+                grad_norm_sum += diag["grad_norm"]
+                rl_loss_sum += diag["rl_loss"]
+                num_updates += 1
+
             t2 = time.time()
+
+            # Per-iteration averages for plotting.
+            if num_updates > 0:
+                training_loss_list.append(total_loss_sum / num_updates)
+                rtg_loss_list.append(rtg_loss_sum / num_updates)
+                action_loss_list.append(action_loss_sum / num_updates)
+                temperature_loss_list.append(temperature_loss_sum / num_updates)
+                entropy_list.append(entropy_sum / num_updates)
+                temperature_list.append(temperature_sum / num_updates)
+                grad_norm_list.append(grad_norm_sum / num_updates)
+                rl_loss_list.append(rl_loss_sum / num_updates)
             if evaluator is not None:
                 raw_return, normalized_d4rl_score = evaluator(model=Trainer.model)
                 t3 = time.time()
@@ -658,6 +763,16 @@ def experiment(variant):
 
             # 2) Train for num_updates_per_iter minibatches from buffer.
             t1 = time.time()
+            total_loss_sum = 0.0
+            rtg_loss_sum = 0.0
+            action_loss_sum = 0.0
+            temperature_loss_sum = 0.0
+            entropy_sum = 0.0
+            temperature_sum = 0.0
+            grad_norm_sum = 0.0
+            rl_loss_sum = 0.0
+            num_updates = 0
+
             for _ in range(num_updates_per_iter):
                 (
                     timesteps,
@@ -672,7 +787,7 @@ def experiment(variant):
                     context_len=variant["context_len"],
                 )
 
-                loss = Trainer.train_step(
+                loss, diag = Trainer.train_step(
                     timesteps=timesteps,
                     states=states,
                     actions=actions,
@@ -682,13 +797,68 @@ def experiment(variant):
                     beta_rl=beta_rl,
                     adv_scale=adv_scale,
                 )
-                if args.use_wandb:
-                    wandb.log(
-                        data={
-                            "training/loss": loss,
-                        }
+                global_update_step += 1
+                if global_update_step % 200 == 0:
+                    print(
+                        f"[Online step {global_update_step}] "
+                        f"loss={loss:.4f}, rtg_loss={diag['returns_to_go_loss']:.4f}, "
+                        f"action_loss={diag['action_loss']:.4f}, "
+                        f"temp_loss={diag['temperature_loss']:.4f}, "
+                        f"entropy={diag['entropy']:.4f}, "
+                        f"temp={diag['temperature']:.4f}, "
+                        f"grad_norm={diag['grad_norm']:.4f}, "
+                        f"adv_mean={diag['adv_mean']}, "
+                        f"adv_std={diag['adv_std']}, "
+                        f"weights_mean={diag['weights_mean']}, "
+                        f"weights_max={diag['weights_max']}"
                     )
+                if args.use_wandb:
+                    log_data = {"training/loss": loss}
+                    if global_update_step % 200 == 0:
+                        log_data.update(
+                            {
+                                "training/returns_to_go_loss": diag["returns_to_go_loss"],
+                                "training/action_loss": diag["action_loss"],
+                                "training/temperature_loss": diag["temperature_loss"],
+                                "training/entropy": diag["entropy"],
+                                "training/temperature": diag["temperature"],
+                                "training/grad_norm": diag["grad_norm"],
+                            }
+                        )
+                        if diag.get("adv_mean") is not None:
+                            log_data["training/adv_mean"] = diag["adv_mean"]
+                            log_data["training/adv_std"] = diag["adv_std"]
+                            log_data["training/adv_max"] = diag["adv_max"]
+                            log_data["training/adv_min"] = diag["adv_min"]
+                        if diag.get("weights_mean") is not None:
+                            log_data["training/weights_mean"] = diag["weights_mean"]
+                            log_data["training/weights_max"] = diag["weights_max"]
+
+                    wandb.log(data=log_data)
+
+                # accumulate per-iteration sums (online)
+                total_loss_sum += loss
+                rtg_loss_sum += diag["returns_to_go_loss"]
+                action_loss_sum += diag["action_loss"]
+                temperature_loss_sum += diag["temperature_loss"]
+                entropy_sum += diag["entropy"]
+                temperature_sum += diag["temperature"]
+                grad_norm_sum += diag["grad_norm"]
+                rl_loss_sum += diag["rl_loss"]
+                num_updates += 1
+
             t2 = time.time()
+
+            # Per-iteration averages for plotting (online).
+            if num_updates > 0:
+                training_loss_list.append(total_loss_sum / num_updates)
+                rtg_loss_list.append(rtg_loss_sum / num_updates)
+                action_loss_list.append(action_loss_sum / num_updates)
+                temperature_loss_list.append(temperature_loss_sum / num_updates)
+                entropy_list.append(entropy_sum / num_updates)
+                temperature_list.append(temperature_sum / num_updates)
+                grad_norm_list.append(grad_norm_sum / num_updates)
+                rl_loss_list.append(rl_loss_sum / num_updates)
 
             # 3) Evaluate with deterministic actions.
             if evaluator is not None:
@@ -718,6 +888,7 @@ def experiment(variant):
                 )
             )
 
+    # Log final evaluation summary to wandb if enabled.
     if normalized_d4rl_score_list and args.use_wandb:
         wandb.log(
             data={
@@ -725,18 +896,20 @@ def experiment(variant):
                 "evaluation/last_score": normalized_d4rl_score_list[-1],
             }
         )
+    # Print and plot evaluation and training diagnostics.
     if normalized_d4rl_score_list:
         print("Evaluation scores over iterations:", normalized_d4rl_score_list)
 
         if raw_return_list:
             print("Raw returns over iterations:", raw_return_list)
 
-        # Plot evaluation curves if matplotlib is available.
+        # Plot evaluation curves and training diagnostics if matplotlib is available.
         if plt is not None:
-            os.makedirs("plots", exist_ok=True)
-            # Use start_time_str to avoid overwriting previous runs.
+            os.makedirs(plot_run_dir, exist_ok=True)
+
+            # Evaluation plots.
             plot_path_norm = os.path.join(
-                "plots", f"{d4rl_env}_eval_{start_time_str}.png"
+                plot_run_dir, f"{d4rl_env}_eval_{start_time_str}.png"
             )
             plt.figure()
             plt.plot(normalized_d4rl_score_list, marker="o")
@@ -748,10 +921,9 @@ def experiment(variant):
             plt.savefig(plot_path_norm)
             plt.close()
 
-            # Raw return plot.
             if raw_return_list:
                 plot_path_raw = os.path.join(
-                    "plots", f"{d4rl_env}_eval_raw_return_{start_time_str}.png"
+                    plot_run_dir, f"{d4rl_env}_eval_raw_return_{start_time_str}.png"
                 )
                 plt.figure()
                 plt.plot(raw_return_list, marker="o")
@@ -767,8 +939,53 @@ def experiment(variant):
                 print(f"Saved raw return evaluation plot to {plot_path_raw}")
 
             print(f"Saved normalized evaluation plot to {plot_path_norm}")
+
+            # Training loss/components plot.
+            if training_loss_list:
+                iter_steps = list(range(1, len(training_loss_list) + 1))
+                train_loss_path = os.path.join(
+                    plot_run_dir, f"{d4rl_env}_training_losses_{start_time_str}.png"
+                )
+                plt.figure()
+                plt.plot(iter_steps, training_loss_list, label="total_loss")
+                plt.plot(iter_steps, rtg_loss_list, label="rtg_loss")
+                plt.plot(iter_steps, action_loss_list, label="action_loss")
+                plt.plot(iter_steps, temperature_loss_list, label="temperature_loss")
+                plt.plot(iter_steps, rl_loss_list, label="rl_loss")
+                plt.xlabel("Training iteration")
+                plt.ylabel("Loss")
+                plt.title(f"Training losses (per-iteration) - {eval_env_id or d4rl_env}")
+                plt.legend()
+                plt.grid(True)
+                plt.tight_layout()
+                plt.savefig(train_loss_path)
+                plt.close()
+                print(f"Saved training loss plot to {train_loss_path}")
+
+            # Policy stats plot (entropy, temperature, grad_norm).
+            if entropy_list or temperature_list or grad_norm_list:
+                iter_steps = list(range(1, len(entropy_list) + 1))
+                stats_path = os.path.join(
+                    plot_run_dir, f"{d4rl_env}_training_stats_{start_time_str}.png"
+                )
+                plt.figure()
+                if entropy_list:
+                    plt.plot(iter_steps, entropy_list, label="entropy")
+                if temperature_list:
+                    plt.plot(iter_steps, temperature_list, label="temperature")
+                if grad_norm_list:
+                    plt.plot(iter_steps, grad_norm_list, label="grad_norm")
+                plt.xlabel("Training iteration")
+                plt.ylabel("Value")
+                plt.title(f"Training stats (per-iteration) - {eval_env_id or d4rl_env}")
+                plt.legend()
+                plt.grid(True)
+                plt.tight_layout()
+                plt.savefig(stats_path)
+                plt.close()
+                print(f"Saved training stats plot to {stats_path}")
         else:
-            print("matplotlib not available; skipping evaluation plot.")
+            print("matplotlib not available; skipping evaluation/training plots.")
     else:
         print("No online evaluation was performed (evaluation env not available).")
     print("=" * 60)

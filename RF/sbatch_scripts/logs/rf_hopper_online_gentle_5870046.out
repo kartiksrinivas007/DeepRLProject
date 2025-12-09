@@ -1,0 +1,150 @@
+Running online Reinformer (Hopper-medium) very gentle on babel-n5-24
+beta_rl=0.01, adv_scale=3.0
+Tue Dec  9 06:49:46 EST 2025
+============================================================
+start time: 25-12-09-06-49-50
+============================================================
+dataset size: 1327
+returns max : 3908.8544921875
+returns mean: 2817.7890625
+returns std : 877.09326171875
+returns min : 1350.3359375
+Using Minari eval environment: Hopper-v5
+Loaded pretrained model from models/reinformer_hopper_medium_offline.pt
+[Online step 200] loss=2.4498, rtg_loss=0.0002, action_loss=2.4199, temp_loss=0.1232, entropy=4.2567, temp=0.0980, grad_norm=0.2500, adv_mean=3.5762788286319847e-08, adv_std=0.9996092915534973, weights_mean=1.046665072441101, weights_max=1.854905605316162
+[Online] Iteration 1/50 - last training loss: 2.4444, last eval raw return: 2122.50, last eval normalized score: 65.84
+[Online step 400] loss=2.4616, rtg_loss=0.0002, action_loss=2.4316, temp_loss=0.1208, entropy=4.2567, temp=0.0961, grad_norm=0.2500, adv_mean=-3.50177309371702e-08, adv_std=0.9996092915534973, weights_mean=1.0465420484542847, weights_max=1.7403525114059448
+[Online step 600] loss=2.4574, rtg_loss=0.0002, action_loss=2.4275, temp_loss=0.1185, entropy=4.2567, temp=0.0942, grad_norm=0.2500, adv_mean=-3.278255533700758e-08, adv_std=0.9996092319488525, weights_mean=1.0465593338012695, weights_max=1.741863489151001
+[Online] Iteration 2/50 - last training loss: 2.4574, last eval raw return: 1829.13, last eval normalized score: 56.82
+[Online step 800] loss=2.4691, rtg_loss=0.0002, action_loss=2.4393, temp_loss=0.1162, entropy=4.2567, temp=0.0924, grad_norm=0.2500, adv_mean=5.569308925146288e-08, adv_std=0.9996092915534973, weights_mean=1.0462754964828491, weights_max=1.6982446908950806
+[Online] Iteration 3/50 - last training loss: 2.4804, last eval raw return: 2557.03, last eval normalized score: 79.19
+[Online step 1000] loss=2.4794, rtg_loss=0.0002, action_loss=2.4496, temp_loss=0.1140, entropy=4.2567, temp=0.0907, grad_norm=0.2500, adv_mean=4.7683716530855236e-08, adv_std=0.9996092915534973, weights_mean=1.0462119579315186, weights_max=1.7552375793457031
+[Online step 1200] loss=2.4893, rtg_loss=0.0002, action_loss=2.4595, temp_loss=0.1118, entropy=4.2567, temp=0.0890, grad_norm=0.2500, adv_mean=5.960464477539063e-08, adv_std=0.9996093511581421, weights_mean=1.0457428693771362, weights_max=1.7076348066329956
+[Online] Iteration 4/50 - last training loss: 2.4893, last eval raw return: 2156.54, last eval normalized score: 66.88
+[Online step 1400] loss=2.4983, rtg_loss=0.0002, action_loss=2.4685, temp_loss=0.1097, entropy=4.2567, temp=0.0873, grad_norm=0.2500, adv_mean=1.1920928955078125e-07, adv_std=0.9996092319488525, weights_mean=1.0458747148513794, weights_max=1.7801215648651123
+[Online] Iteration 5/50 - last training loss: 2.5014, last eval raw return: 2305.98, last eval normalized score: 71.48
+[Online step 1600] loss=2.5102, rtg_loss=0.0002, action_loss=2.4803, temp_loss=0.1076, entropy=4.2567, temp=0.0856, grad_norm=0.2500, adv_mean=1.2516976255483314e-07, adv_std=0.9996093511581421, weights_mean=1.0455824136734009, weights_max=1.773363471031189
+[Online step 1800] loss=2.5157, rtg_loss=0.0002, action_loss=2.4858, temp_loss=0.1056, entropy=4.2567, temp=0.0840, grad_norm=0.2500, adv_mean=7.748604247126423e-08, adv_std=0.9996092915534973, weights_mean=1.046471357345581, weights_max=1.7009556293487549
+[Online] Iteration 6/50 - last training loss: 2.5157, last eval raw return: 1859.80, last eval normalized score: 57.77
+[Online step 2000] loss=2.5143, rtg_loss=0.0002, action_loss=2.4845, temp_loss=0.1037, entropy=4.2567, temp=0.0825, grad_norm=0.2500, adv_mean=-4.5448540930692616e-08, adv_std=0.9996092915534973, weights_mean=1.045534372329712, weights_max=1.744600534439087
+[Online] Iteration 7/50 - last training loss: 2.5206, last eval raw return: 2869.44, last eval normalized score: 88.79
+[Online step 2200] loss=2.5125, rtg_loss=0.0002, action_loss=2.4827, temp_loss=0.1017, entropy=4.2567, temp=0.0810, grad_norm=0.2500, adv_mean=1.2814999195143173e-07, adv_std=0.9996092319488525, weights_mean=1.0464776754379272, weights_max=1.7868666648864746
+[Online step 2400] loss=2.5333, rtg_loss=0.0002, action_loss=2.5034, temp_loss=0.0999, entropy=4.2567, temp=0.0795, grad_norm=0.2500, adv_mean=3.5762788286319847e-08, adv_std=0.9996092915534973, weights_mean=1.0453822612762451, weights_max=1.7272154092788696
+[Online] Iteration 8/50 - last training loss: 2.5333, last eval raw return: 1547.57, last eval normalized score: 48.17
+[Online step 2600] loss=2.5504, rtg_loss=0.0002, action_loss=2.5204, temp_loss=0.0980, entropy=4.2567, temp=0.0780, grad_norm=0.2500, adv_mean=1.4752150434560463e-07, adv_std=0.9996094107627869, weights_mean=1.0455421209335327, weights_max=1.7623188495635986
+[Online] Iteration 9/50 - last training loss: 2.5525, last eval raw return: 2624.55, last eval normalized score: 81.26
+[Online step 2800] loss=2.5470, rtg_loss=0.0002, action_loss=2.5171, temp_loss=0.0962, entropy=4.2567, temp=0.0766, grad_norm=0.2500, adv_mean=-1.3932586284681747e-07, adv_std=0.9996092319488525, weights_mean=1.0460160970687866, weights_max=1.9094204902648926
+[Online step 3000] loss=2.5561, rtg_loss=0.0002, action_loss=2.5262, temp_loss=0.0945, entropy=4.2567, temp=0.0752, grad_norm=0.2500, adv_mean=-8.642673776648735e-08, adv_std=0.9996092915534973, weights_mean=1.0459873676300049, weights_max=1.828752040863037
+[Online] Iteration 10/50 - last training loss: 2.5561, last eval raw return: 2919.05, last eval normalized score: 90.31
+[Online step 3200] loss=2.5794, rtg_loss=0.0002, action_loss=2.5494, temp_loss=0.0928, entropy=4.2567, temp=0.0738, grad_norm=0.2500, adv_mean=-1.9371510617816057e-08, adv_std=0.9996093511581421, weights_mean=1.0449745655059814, weights_max=1.7703917026519775
+[Online] Iteration 11/50 - last training loss: 2.5599, last eval raw return: 2497.71, last eval normalized score: 77.37
+[Online step 3400] loss=2.5804, rtg_loss=0.0002, action_loss=2.5504, temp_loss=0.0911, entropy=4.2567, temp=0.0725, grad_norm=0.2500, adv_mean=-4.023313593393141e-08, adv_std=0.9996092319488525, weights_mean=1.0454936027526855, weights_max=1.69294011592865
+[Online step 3600] loss=2.5811, rtg_loss=0.0002, action_loss=2.5512, temp_loss=0.0894, entropy=4.2567, temp=0.0711, grad_norm=0.2500, adv_mean=3.315508578793924e-08, adv_std=0.9996092915534973, weights_mean=1.0454895496368408, weights_max=1.8030831813812256
+[Online] Iteration 12/50 - last training loss: 2.5811, last eval raw return: 2459.64, last eval normalized score: 76.20
+[Online step 3800] loss=2.5783, rtg_loss=0.0002, action_loss=2.5484, temp_loss=0.0878, entropy=4.2567, temp=0.0699, grad_norm=0.2500, adv_mean=-8.30739779189571e-08, adv_std=0.9996092915534973, weights_mean=1.0456151962280273, weights_max=1.5905568599700928
+[Online] Iteration 13/50 - last training loss: 2.5796, last eval raw return: 2417.51, last eval normalized score: 74.90
+[Online step 4000] loss=2.5788, rtg_loss=0.0002, action_loss=2.5489, temp_loss=0.0862, entropy=4.2567, temp=0.0686, grad_norm=0.2500, adv_mean=-5.2899121527616444e-08, adv_std=0.9996093511581421, weights_mean=1.0451374053955078, weights_max=1.7514339685440063
+[Online step 4200] loss=2.6078, rtg_loss=0.0002, action_loss=2.5777, temp_loss=0.0846, entropy=4.2567, temp=0.0674, grad_norm=0.2500, adv_mean=2.9802322831784522e-09, adv_std=0.9996092319488525, weights_mean=1.0445328950881958, weights_max=1.6333935260772705
+[Online] Iteration 14/50 - last training loss: 2.6078, last eval raw return: 2975.68, last eval normalized score: 92.05
+[Online step 4400] loss=2.6175, rtg_loss=0.0003, action_loss=2.5875, temp_loss=0.0831, entropy=4.2567, temp=0.0661, grad_norm=0.2500, adv_mean=3.3527612686157227e-08, adv_std=0.9996092319488525, weights_mean=1.0456618070602417, weights_max=1.748237133026123
+[Online] Iteration 15/50 - last training loss: 2.6023, last eval raw return: 3114.03, last eval normalized score: 96.30
+[Online step 4600] loss=2.6222, rtg_loss=0.0003, action_loss=2.5922, temp_loss=0.0816, entropy=4.2567, temp=0.0649, grad_norm=0.2500, adv_mean=-8.940697071579962e-09, adv_std=0.9996092319488525, weights_mean=1.0446407794952393, weights_max=1.942522644996643
+[Online step 4800] loss=2.6056, rtg_loss=0.0002, action_loss=2.5756, temp_loss=0.0801, entropy=4.2567, temp=0.0638, grad_norm=0.2500, adv_mean=2.9802322387695312e-08, adv_std=0.9996093511581421, weights_mean=1.0461242198944092, weights_max=1.6949458122253418
+[Online] Iteration 16/50 - last training loss: 2.6056, last eval raw return: 13.33, last eval normalized score: 1.03
+[Online step 5000] loss=2.6167, rtg_loss=0.0003, action_loss=2.5867, temp_loss=0.0787, entropy=4.2567, temp=0.0626, grad_norm=0.2500, adv_mean=9.313225746154785e-08, adv_std=0.9996092319488525, weights_mean=1.0449272394180298, weights_max=1.880789041519165
+[Online] Iteration 17/50 - last training loss: 2.6159, last eval raw return: 12.94, last eval normalized score: 1.02
+[Online step 5200] loss=2.6200, rtg_loss=0.0002, action_loss=2.5901, temp_loss=0.0773, entropy=4.2567, temp=0.0615, grad_norm=0.2500, adv_mean=-7.711351202033256e-08, adv_std=0.9996093511581421, weights_mean=1.0453404188156128, weights_max=1.8370553255081177
+[Online step 5400] loss=2.6484, rtg_loss=0.0003, action_loss=2.6183, temp_loss=0.0759, entropy=4.2567, temp=0.0604, grad_norm=0.2500, adv_mean=5.960464477539063e-08, adv_std=0.9996091723442078, weights_mean=1.044427752494812, weights_max=1.7046804428100586
+[Online] Iteration 18/50 - last training loss: 2.6484, last eval raw return: 10.59, last eval normalized score: 0.95
+[Online step 5600] loss=2.6255, rtg_loss=0.0002, action_loss=2.5956, temp_loss=0.0745, entropy=4.2567, temp=0.0593, grad_norm=0.2500, adv_mean=7.748604247126423e-08, adv_std=0.9996094107627869, weights_mean=1.0448453426361084, weights_max=1.6153327226638794
+[Online] Iteration 19/50 - last training loss: 2.6385, last eval raw return: 9.89, last eval normalized score: 0.93
+[Online step 5800] loss=2.6303, rtg_loss=0.0002, action_loss=2.6004, temp_loss=0.0732, entropy=4.2567, temp=0.0582, grad_norm=0.2500, adv_mean=1.2591480924584175e-07, adv_std=0.9996092915534973, weights_mean=1.0446895360946655, weights_max=1.7418617010116577
+[Online step 6000] loss=2.6628, rtg_loss=0.0002, action_loss=2.6327, temp_loss=0.0719, entropy=4.2567, temp=0.0572, grad_norm=0.2500, adv_mean=6.258488127741657e-08, adv_std=0.9996093511581421, weights_mean=1.0445865392684937, weights_max=1.6357194185256958
+[Online] Iteration 20/50 - last training loss: 2.6628, last eval raw return: 10.51, last eval normalized score: 0.95
+[Online step 6200] loss=2.6313, rtg_loss=0.0002, action_loss=2.6014, temp_loss=0.0706, entropy=4.2567, temp=0.0562, grad_norm=0.2500, adv_mean=-6.482004977215183e-08, adv_std=0.9996094107627869, weights_mean=1.0455538034439087, weights_max=1.8207597732543945
+[Online] Iteration 21/50 - last training loss: 2.6507, last eval raw return: 11.46, last eval normalized score: 0.97
+[Online step 6400] loss=2.6457, rtg_loss=0.0002, action_loss=2.6158, temp_loss=0.0693, entropy=4.2567, temp=0.0551, grad_norm=0.2500, adv_mean=4.17232506322307e-08, adv_std=0.9996093511581421, weights_mean=1.0448583364486694, weights_max=1.7649621963500977
+[Online step 6600] loss=2.6544, rtg_loss=0.0002, action_loss=2.6245, temp_loss=0.0681, entropy=4.2567, temp=0.0542, grad_norm=0.2500, adv_mean=8.493662306818806e-08, adv_std=0.9996092319488525, weights_mean=1.0445441007614136, weights_max=1.6062648296356201
+[Online] Iteration 22/50 - last training loss: 2.6544, last eval raw return: 8.98, last eval normalized score: 0.90
+[Online step 6800] loss=2.6630, rtg_loss=0.0002, action_loss=2.6331, temp_loss=0.0668, entropy=4.2567, temp=0.0532, grad_norm=0.2500, adv_mean=3.5762788286319847e-08, adv_std=0.9996092319488525, weights_mean=1.0447494983673096, weights_max=1.8937404155731201
+[Online] Iteration 23/50 - last training loss: 2.6713, last eval raw return: 9.86, last eval normalized score: 0.93
+[Online step 7000] loss=2.6552, rtg_loss=0.0003, action_loss=2.6253, temp_loss=0.0656, entropy=4.2567, temp=0.0522, grad_norm=0.2500, adv_mean=-7.450580596923828e-09, adv_std=0.9996092319488525, weights_mean=1.0447943210601807, weights_max=1.6754695177078247
+[Online step 7200] loss=2.6708, rtg_loss=0.0002, action_loss=2.6408, temp_loss=0.0645, entropy=4.2567, temp=0.0513, grad_norm=0.2500, adv_mean=6.109475947368992e-08, adv_std=0.9996092319488525, weights_mean=1.0449684858322144, weights_max=1.7702161073684692
+[Online] Iteration 24/50 - last training loss: 2.6708, last eval raw return: 10.13, last eval normalized score: 0.93
+[Online step 7400] loss=2.6702, rtg_loss=0.0002, action_loss=2.6403, temp_loss=0.0633, entropy=4.2567, temp=0.0504, grad_norm=0.2500, adv_mean=1.6838312433264946e-07, adv_std=0.9996092915534973, weights_mean=1.0442615747451782, weights_max=1.7308509349822998
+[Online] Iteration 25/50 - last training loss: 2.6721, last eval raw return: 9.91, last eval normalized score: 0.93
+[Online step 7600] loss=2.6787, rtg_loss=0.0003, action_loss=2.6485, temp_loss=0.0622, entropy=4.2567, temp=0.0495, grad_norm=0.2500, adv_mean=-7.450580596923828e-09, adv_std=0.9996092915534973, weights_mean=1.0462263822555542, weights_max=1.6681524515151978
+[Online step 7800] loss=2.6708, rtg_loss=0.0003, action_loss=2.6409, temp_loss=0.0610, entropy=4.2567, temp=0.0486, grad_norm=0.2500, adv_mean=9.685754776000977e-08, adv_std=0.9996094107627869, weights_mean=1.0448716878890991, weights_max=1.7973320484161377
+[Online] Iteration 26/50 - last training loss: 2.6708, last eval raw return: 9.73, last eval normalized score: 0.92
+[Online step 8000] loss=2.6717, rtg_loss=0.0002, action_loss=2.6419, temp_loss=0.0599, entropy=4.2567, temp=0.0477, grad_norm=0.2500, adv_mean=1.0207295275677097e-07, adv_std=0.9996092915534973, weights_mean=1.0437841415405273, weights_max=1.6417522430419922
+[Online] Iteration 27/50 - last training loss: 2.6878, last eval raw return: 9.16, last eval normalized score: 0.90
+[Online step 8200] loss=2.6892, rtg_loss=0.0002, action_loss=2.6592, temp_loss=0.0589, entropy=4.2567, temp=0.0468, grad_norm=0.2500, adv_mean=0.0, adv_std=0.9996092915534973, weights_mean=1.0446844100952148, weights_max=1.6818163394927979
+[Online step 8400] loss=2.6820, rtg_loss=0.0003, action_loss=2.6520, temp_loss=0.0578, entropy=4.2567, temp=0.0460, grad_norm=0.2500, adv_mean=-7.00354618743404e-08, adv_std=0.9996093511581421, weights_mean=1.0462006330490112, weights_max=1.8475549221038818
+[Online] Iteration 28/50 - last training loss: 2.6820, last eval raw return: 9.05, last eval normalized score: 0.90
+[Online step 8600] loss=2.6846, rtg_loss=0.0003, action_loss=2.6546, temp_loss=0.0568, entropy=4.2567, temp=0.0452, grad_norm=0.2500, adv_mean=6.854534007061375e-08, adv_std=0.9996092915534973, weights_mean=1.0450941324234009, weights_max=2.1080565452575684
+[Online] Iteration 29/50 - last training loss: 2.6881, last eval raw return: 10.52, last eval normalized score: 0.95
+[Online step 8800] loss=2.7085, rtg_loss=0.0002, action_loss=2.6784, temp_loss=0.0558, entropy=4.2567, temp=0.0444, grad_norm=0.2500, adv_mean=8.642673776648735e-08, adv_std=0.9996091723442078, weights_mean=1.0440632104873657, weights_max=1.7556705474853516
+[Online step 9000] loss=2.6947, rtg_loss=0.0002, action_loss=2.6648, temp_loss=0.0548, entropy=4.2567, temp=0.0436, grad_norm=0.2500, adv_mean=2.9802322387695312e-08, adv_std=0.9996093511581421, weights_mean=1.044942855834961, weights_max=1.6934353113174438
+[Online] Iteration 30/50 - last training loss: 2.6947, last eval raw return: 12.85, last eval normalized score: 1.02
+[Online step 9200] loss=2.6997, rtg_loss=0.0003, action_loss=2.6698, temp_loss=0.0538, entropy=4.2567, temp=0.0428, grad_norm=0.2500, adv_mean=7.748604247126423e-08, adv_std=0.9996093511581421, weights_mean=1.043685793876648, weights_max=1.6615219116210938
+[Online] Iteration 31/50 - last training loss: 2.7294, last eval raw return: 11.53, last eval normalized score: 0.98
+[Online step 9400] loss=2.7194, rtg_loss=0.0003, action_loss=2.6894, temp_loss=0.0528, entropy=4.2566, temp=0.0420, grad_norm=0.2500, adv_mean=5.21540641784668e-08, adv_std=0.9996094107627869, weights_mean=1.0433921813964844, weights_max=1.6181893348693848
+[Online step 9600] loss=2.7075, rtg_loss=0.0003, action_loss=2.6775, temp_loss=0.0519, entropy=4.2566, temp=0.0413, grad_norm=0.2500, adv_mean=-4.470348535789981e-09, adv_std=0.9996092319488525, weights_mean=1.0447922945022583, weights_max=1.6905196905136108
+[Online] Iteration 32/50 - last training loss: 2.7075, last eval raw return: 11.16, last eval normalized score: 0.97
+[Online step 9800] loss=2.6959, rtg_loss=0.0002, action_loss=2.6661, temp_loss=0.0509, entropy=4.2566, temp=0.0405, grad_norm=0.2500, adv_mean=2.9802322831784522e-09, adv_std=0.9996092915534973, weights_mean=1.0452377796173096, weights_max=1.7049351930618286
+[Online] Iteration 33/50 - last training loss: 2.7157, last eval raw return: 10.14, last eval normalized score: 0.93
+[Online step 10000] loss=2.7290, rtg_loss=0.0003, action_loss=2.6989, temp_loss=0.0500, entropy=4.2566, temp=0.0398, grad_norm=0.2500, adv_mean=1.1399388455402004e-07, adv_std=0.9996093511581421, weights_mean=1.0432789325714111, weights_max=1.8064165115356445
+[Online step 10200] loss=2.7169, rtg_loss=0.0002, action_loss=2.6870, temp_loss=0.0491, entropy=4.2566, temp=0.0391, grad_norm=0.2500, adv_mean=4.246831153409403e-08, adv_std=0.9996092915534973, weights_mean=1.044489860534668, weights_max=1.7298072576522827
+[Online] Iteration 34/50 - last training loss: 2.7169, last eval raw return: 11.27, last eval normalized score: 0.97
+[Online step 10400] loss=2.7376, rtg_loss=0.0002, action_loss=2.7076, temp_loss=0.0482, entropy=4.2566, temp=0.0384, grad_norm=0.2500, adv_mean=8.791685246478664e-08, adv_std=0.9996094107627869, weights_mean=1.0432237386703491, weights_max=1.6001845598220825
+[Online] Iteration 35/50 - last training loss: 2.7352, last eval raw return: 10.22, last eval normalized score: 0.94
+[Online step 10600] loss=2.7239, rtg_loss=0.0002, action_loss=2.6940, temp_loss=0.0474, entropy=4.2566, temp=0.0377, grad_norm=0.2500, adv_mean=-1.5646220319354143e-08, adv_std=0.9996093511581421, weights_mean=1.043765902519226, weights_max=1.7090415954589844
+[Online step 10800] loss=2.7202, rtg_loss=0.0002, action_loss=2.6902, temp_loss=0.0465, entropy=4.2566, temp=0.0370, grad_norm=0.2500, adv_mean=7.00354618743404e-08, adv_std=0.9996092319488525, weights_mean=1.0444424152374268, weights_max=1.7663151025772095
+[Online] Iteration 36/50 - last training loss: 2.7202, last eval raw return: 9.09, last eval normalized score: 0.90
+[Online step 11000] loss=2.7307, rtg_loss=0.0002, action_loss=2.7007, temp_loss=0.0457, entropy=4.2566, temp=0.0364, grad_norm=0.2500, adv_mean=-3.054737973684496e-08, adv_std=0.9996092915534973, weights_mean=1.0435237884521484, weights_max=1.7495548725128174
+[Online] Iteration 37/50 - last training loss: 2.7395, last eval raw return: 9.95, last eval normalized score: 0.93
+[Online step 11200] loss=2.7299, rtg_loss=0.0002, action_loss=2.7000, temp_loss=0.0449, entropy=4.2566, temp=0.0357, grad_norm=0.2500, adv_mean=2.086162531611535e-08, adv_std=0.9996093511581421, weights_mean=1.0449745655059814, weights_max=1.6833451986312866
+[Online step 11400] loss=2.7324, rtg_loss=0.0003, action_loss=2.7024, temp_loss=0.0441, entropy=4.2566, temp=0.0351, grad_norm=0.2500, adv_mean=-3.4272670035306874e-08, adv_std=0.9996094107627869, weights_mean=1.0449706315994263, weights_max=1.7999314069747925
+[Online] Iteration 38/50 - last training loss: 2.7324, last eval raw return: 9.79, last eval normalized score: 0.92
+[Online step 11600] loss=2.7354, rtg_loss=0.0003, action_loss=2.7054, temp_loss=0.0433, entropy=4.2566, temp=0.0344, grad_norm=0.2500, adv_mean=-2.2351741790771484e-08, adv_std=0.9996092915534973, weights_mean=1.0434094667434692, weights_max=1.9706649780273438
+[Online] Iteration 39/50 - last training loss: 2.7296, last eval raw return: 10.63, last eval normalized score: 0.95
+[Online step 11800] loss=2.7388, rtg_loss=0.0002, action_loss=2.7089, temp_loss=0.0425, entropy=4.2566, temp=0.0338, grad_norm=0.2500, adv_mean=5.364418242947977e-08, adv_std=0.9996093511581421, weights_mean=1.0445843935012817, weights_max=1.6314488649368286
+[Online step 12000] loss=2.7574, rtg_loss=0.0004, action_loss=2.7273, temp_loss=0.0417, entropy=4.2566, temp=0.0332, grad_norm=0.2500, adv_mean=-1.639127766850379e-08, adv_std=0.9996092319488525, weights_mean=1.043893814086914, weights_max=1.9722994565963745
+[Online] Iteration 40/50 - last training loss: 2.7574, last eval raw return: 11.80, last eval normalized score: 0.99
+[Online step 12200] loss=2.7717, rtg_loss=0.0003, action_loss=2.7415, temp_loss=0.0410, entropy=4.2566, temp=0.0326, grad_norm=0.2500, adv_mean=-5.06639494801675e-08, adv_std=0.9996092915534973, weights_mean=1.0426762104034424, weights_max=1.661937952041626
+[Online] Iteration 41/50 - last training loss: 2.7569, last eval raw return: 11.85, last eval normalized score: 0.99
+[Online step 12400] loss=2.7590, rtg_loss=0.0003, action_loss=2.7289, temp_loss=0.0402, entropy=4.2566, temp=0.0320, grad_norm=0.2500, adv_mean=5.662441182607836e-08, adv_std=0.9996093511581421, weights_mean=1.0442661046981812, weights_max=1.710661768913269
+[Online step 12600] loss=2.7465, rtg_loss=0.0003, action_loss=2.7166, temp_loss=0.0395, entropy=4.2566, temp=0.0314, grad_norm=0.2500, adv_mean=7.376075217280231e-08, adv_std=0.9996093511581421, weights_mean=1.043585181236267, weights_max=1.697896957397461
+[Online] Iteration 42/50 - last training loss: 2.7465, last eval raw return: 11.79, last eval normalized score: 0.99
+[Online step 12800] loss=2.7533, rtg_loss=0.0002, action_loss=2.7233, temp_loss=0.0388, entropy=4.2566, temp=0.0309, grad_norm=0.2500, adv_mean=3.054737973684496e-08, adv_std=0.9996093511581421, weights_mean=1.0447452068328857, weights_max=1.7086881399154663
+[Online] Iteration 43/50 - last training loss: 2.7650, last eval raw return: 12.97, last eval normalized score: 1.02
+[Online step 13000] loss=2.7516, rtg_loss=0.0002, action_loss=2.7217, temp_loss=0.0381, entropy=4.2566, temp=0.0303, grad_norm=0.2500, adv_mean=-7.078051478259795e-09, adv_std=0.9996092319488525, weights_mean=1.044011116027832, weights_max=1.7484341859817505
+[Online step 13200] loss=2.7735, rtg_loss=0.0002, action_loss=2.7434, temp_loss=0.0374, entropy=4.2566, temp=0.0298, grad_norm=0.2500, adv_mean=1.4901161415892261e-09, adv_std=0.9996094107627869, weights_mean=1.0447009801864624, weights_max=1.7393397092819214
+[Online] Iteration 44/50 - last training loss: 2.7735, last eval raw return: 13.74, last eval normalized score: 1.05
+[Online step 13400] loss=2.7726, rtg_loss=0.0003, action_loss=2.7425, temp_loss=0.0368, entropy=4.2566, temp=0.0292, grad_norm=0.2500, adv_mean=1.639127766850379e-08, adv_std=0.9996092319488525, weights_mean=1.0441391468048096, weights_max=2.142569065093994
+[Online] Iteration 45/50 - last training loss: 2.7681, last eval raw return: 11.83, last eval normalized score: 0.99
+[Online step 13600] loss=2.7743, rtg_loss=0.0003, action_loss=2.7442, temp_loss=0.0361, entropy=4.2566, temp=0.0287, grad_norm=0.2500, adv_mean=-8.940696716308594e-08, adv_std=0.9996093511581421, weights_mean=1.043558955192566, weights_max=1.808326005935669
+[Online step 13800] loss=2.7783, rtg_loss=0.0003, action_loss=2.7482, temp_loss=0.0354, entropy=4.2566, temp=0.0282, grad_norm=0.2500, adv_mean=5.9604645663569045e-09, adv_std=0.9996092319488525, weights_mean=1.0437580347061157, weights_max=1.619895577430725
+[Online] Iteration 46/50 - last training loss: 2.7783, last eval raw return: 12.79, last eval normalized score: 1.02
+[Online step 14000] loss=2.7877, rtg_loss=0.0003, action_loss=2.7576, temp_loss=0.0348, entropy=4.2565, temp=0.0277, grad_norm=0.2500, adv_mean=2.533197474008375e-08, adv_std=0.9996092915534973, weights_mean=1.0435782670974731, weights_max=1.617449164390564
+[Online] Iteration 47/50 - last training loss: 2.7869, last eval raw return: 1741.10, last eval normalized score: 54.12
+[Online step 14200] loss=2.8005, rtg_loss=0.0003, action_loss=2.7703, temp_loss=0.0342, entropy=4.2565, temp=0.0272, grad_norm=0.2500, adv_mean=-8.34465012644614e-08, adv_std=0.9996092319488525, weights_mean=1.0440338850021362, weights_max=1.647419810295105
+[Online step 14400] loss=2.7829, rtg_loss=0.0003, action_loss=2.7529, temp_loss=0.0336, entropy=4.2565, temp=0.0267, grad_norm=0.2500, adv_mean=-1.639127766850379e-08, adv_std=0.9996092319488525, weights_mean=1.045374870300293, weights_max=1.734994649887085
+[Online] Iteration 48/50 - last training loss: 2.7829, last eval raw return: 12.12, last eval normalized score: 1.00
+[Online step 14600] loss=2.7937, rtg_loss=0.0003, action_loss=2.7635, temp_loss=0.0330, entropy=4.2565, temp=0.0262, grad_norm=0.2500, adv_mean=2.3841858265427618e-08, adv_std=0.9996093511581421, weights_mean=1.043889045715332, weights_max=1.6869021654129028
+[Online] Iteration 49/50 - last training loss: 2.7900, last eval raw return: 13.46, last eval normalized score: 1.04
+[Online step 14800] loss=2.8008, rtg_loss=0.0003, action_loss=2.7706, temp_loss=0.0324, entropy=4.2565, temp=0.0258, grad_norm=0.2500, adv_mean=9.089708186138523e-08, adv_std=0.9996094107627869, weights_mean=1.0435024499893188, weights_max=1.7475900650024414
+[Online step 15000] loss=2.7921, rtg_loss=0.0002, action_loss=2.7621, temp_loss=0.0318, entropy=4.2565, temp=0.0253, grad_norm=0.2500, adv_mean=1.4901161415892261e-09, adv_std=0.9996092915534973, weights_mean=1.0442419052124023, weights_max=1.5879687070846558
+[Online] Iteration 50/50 - last training loss: 2.7921, last eval raw return: 13.06, last eval normalized score: 1.02
+Evaluation scores over iterations: [65.83867662748182, 56.82481495960434, 79.19013568101131, 66.88473677642222, 71.47651565696708, 57.76715322061132, 88.78931099092254, 48.17344608415689, 81.26473560306574, 90.31350710302222, 77.36739309722253, 76.197869489964, 74.90324112952497, 92.05375266293164, 96.3045911815629, 1.0323494179369603, 1.0205583668138087, 0.9481413285216537, 0.9266984661960832, 0.9457570530049253, 0.9748731639163443, 0.8988827395555685, 0.925857617813673, 0.9341490832970485, 0.9272468831487879, 0.9219781804032311, 0.9042817991318995, 0.9008579181825389, 0.9461932115223688, 1.017623334974388, 0.9772634734896255, 0.9658180102967249, 0.9344954191483722, 0.9690690979662002, 0.9368370811150017, 0.9022624352348527, 0.9285327093408127, 0.9236066776420556, 0.9494967182195762, 0.9854718140291676, 0.9869362686920677, 0.9852526211282723, 1.021500832322365, 1.0451154812336845, 0.9862569488490575, 1.0157698953107612, 54.119905426742854, 0.9951403795492092, 1.0365340513128258, 1.0242283855493508]
+Raw returns over iterations: [2122.4950304965314, 1829.1323850427798, 2557.0279191661175, 2156.539814397587, 2305.9825781506397, 1859.8014651049318, 2869.440020310886, 1547.5673296190773, 2624.5472736688525, 2919.046084849169, 2497.7054438426867, 2459.6424524204135, 2417.507836348889, 2975.6836348809734, 3114.0302480386185, 13.326253247005017, 12.942504962682529, 10.58564009032481, 9.887766631677513, 10.508042119682472, 11.455647001698596, 8.982483696000813, 9.860400613096552, 10.130252352397125, 9.905615257936166, 9.734141517546503, 9.158199993702537, 9.046767312568472, 10.522237213997085, 12.84698222929381, 11.53344135507437, 11.160940479819255, 10.14152410309659, 11.266749478721275, 10.217735184939237, 9.092478335572082, 9.947463401072238, 9.78714213766897, 10.62975222805822, 11.800587732974398, 11.848249468852428, 11.79345394152733, 12.973178184108184, 13.741734007498968, 11.82614051337944, 12.786660695311529, 1741.099148510965, 12.11525818868045, 13.462445165921718, 13.061948376037796]
+Saved raw return evaluation plot to plots/online/hopper_medium/gentle_beta_0.01_adv_3.0/job_5870046/hopper-medium-v2_eval_raw_return_25-12-09-06-49-50.png
+Saved normalized evaluation plot to plots/online/hopper_medium/gentle_beta_0.01_adv_3.0/job_5870046/hopper-medium-v2_eval_25-12-09-06-49-50.png
+Saved training loss plot to plots/online/hopper_medium/gentle_beta_0.01_adv_3.0/job_5870046/hopper-medium-v2_training_losses_25-12-09-06-49-50.png
+Saved training stats plot to plots/online/hopper_medium/gentle_beta_0.01_adv_3.0/job_5870046/hopper-medium-v2_training_stats_25-12-09-06-49-50.png
+============================================================
+finished training!
+finished training at: 25-12-09-06-58-07
+============================================================
+Tue Dec  9 06:58:08 EST 2025
+Finished online-only Reinformer very gentle run.
