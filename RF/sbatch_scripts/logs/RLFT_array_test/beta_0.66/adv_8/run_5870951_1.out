@@ -1,0 +1,34 @@
+============================================================
+start time: 25-12-09-15-02-27
+============================================================
+dataset size: 1327
+returns max : 3908.8544921875
+returns mean: 2817.7890625
+returns std : 877.09326171875
+returns min : 1350.3359375
+Using Minari eval environment: Hopper-v5
+Warning: could not load pretrained model: Error(s) in loading state_dict for ReinFormer:
+	Unexpected key(s) in state_dict: "transformer.4.attention.mask", "transformer.4.attention.q_net.weight", "transformer.4.attention.q_net.bias", "transformer.4.attention.k_net.weight", "transformer.4.attention.k_net.bias", "transformer.4.attention.v_net.weight", "transformer.4.attention.v_net.bias", "transformer.4.attention.proj_net.weight", "transformer.4.attention.proj_net.bias", "transformer.4.mlp.0.weight", "transformer.4.mlp.0.bias", "transformer.4.mlp.2.weight", "transformer.4.mlp.2.bias", "transformer.4.ln1.weight", "transformer.4.ln1.bias", "transformer.4.ln2.weight", "transformer.4.ln2.bias", "transformer.5.attention.mask", "transformer.5.attention.q_net.weight", "transformer.5.attention.q_net.bias", "transformer.5.attention.k_net.weight", "transformer.5.attention.k_net.bias", "transformer.5.attention.v_net.weight", "transformer.5.attention.v_net.bias", "transformer.5.attention.proj_net.weight", "transformer.5.attention.proj_net.bias", "transformer.5.mlp.0.weight", "transformer.5.mlp.0.bias", "transformer.5.mlp.2.weight", "transformer.5.mlp.2.bias", "transformer.5.ln1.weight", "transformer.5.ln1.bias", "transformer.5.ln2.weight", "transformer.5.ln2.bias". 
+	size mismatch for transformer.0.attention.mask: copying a param with shape torch.Size([1, 1, 60, 60]) from checkpoint, the shape in current model is torch.Size([1, 1, 15, 15]).
+	size mismatch for transformer.1.attention.mask: copying a param with shape torch.Size([1, 1, 60, 60]) from checkpoint, the shape in current model is torch.Size([1, 1, 15, 15]).
+	size mismatch for transformer.2.attention.mask: copying a param with shape torch.Size([1, 1, 60, 60]) from checkpoint, the shape in current model is torch.Size([1, 1, 15, 15]).
+	size mismatch for transformer.3.attention.mask: copying a param with shape torch.Size([1, 1, 60, 60]) from checkpoint, the shape in current model is torch.Size([1, 1, 15, 15]).
+[Online] Iteration 1/3 - last training loss: 4.4927, last eval raw return: 1245.96, last eval normalized score: 38.91
+[Online] Iteration 2/3 - last training loss: 4.4223, last eval raw return: 2337.95, last eval normalized score: 72.46
+[Online] Iteration 3/3 - last training loss: 4.4138, last eval raw return: 2554.53, last eval normalized score: 79.11
+Evaluation scores over iterations: [38.90612015147141, 72.45873214645093, 79.11348400108005]
+Raw returns over iterations: [1245.9555063998127, 2337.949523992524, 2554.5332348197576]
+Saved raw return evaluation plot to sbatch_scripts/logs/RLFT_array_test/beta_0.66/adv_8/plots/hopper-medium-v2_eval_raw_return_25-12-09-15-02-27.png
+Saved normalized evaluation plot to sbatch_scripts/logs/RLFT_array_test/beta_0.66/adv_8/plots/hopper-medium-v2_eval_25-12-09-15-02-27.png
+Saved training loss plot to sbatch_scripts/logs/RLFT_array_test/beta_0.66/adv_8/plots/hopper-medium-v2_training_losses_25-12-09-15-02-27.png
+Saved training stats plot to sbatch_scripts/logs/RLFT_array_test/beta_0.66/adv_8/plots/hopper-medium-v2_training_stats_25-12-09-15-02-27.png
+============================================================
+finished training!
+Saved model checkpoint to models/RLFT_array_test/beta_0.66/adv_8/hopper-medium_rlft.pt
+finished training at: 25-12-09-15-04-11
+============================================================
+All plots for this run saved under: sbatch_scripts/logs/RLFT_array_test/beta_0.66/adv_8/plots
+Saved per-iteration training loss plot to sbatch_scripts/logs/RLFT_array_test/beta_0.66/adv_8/plots/hopper-medium-v2_training_losses_25-12-09-15-02-27.png
+Saved per-iteration training stats plot to sbatch_scripts/logs/RLFT_array_test/beta_0.66/adv_8/plots/hopper-medium-v2_training_stats_25-12-09-15-02-27.png
+Saved per-update training loss plot to sbatch_scripts/logs/RLFT_array_test/beta_0.66/adv_8/plots/hopper-medium-v2_training_losses_steps_25-12-09-15-02-27.png
+Saved per-update training stats plot to sbatch_scripts/logs/RLFT_array_test/beta_0.66/adv_8/plots/hopper-medium-v2_training_stats_steps_25-12-09-15-02-27.png

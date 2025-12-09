@@ -1,0 +1,29 @@
+============================================================
+start time: 25-12-09-15-14-34
+============================================================
+dataset size: 1327
+returns max : 3908.8544921875
+returns mean: 2817.7890625
+returns std : 877.09326171875
+returns min : 1350.3359375
+Using Minari eval environment: Hopper-v5
+Loaded pretrained model from sbatch_scripts/logs/tau_lr/K_20/enc_6/tau_0.99/lr_4e-4/model.pt
+[Online] Iteration 1/3 - last training loss: 2.4168, last eval raw return: 1386.85, last eval normalized score: 43.24
+[Online] Iteration 2/3 - last training loss: 2.4502, last eval raw return: 807.91, last eval normalized score: 25.45
+[Online] Iteration 3/3 - last training loss: 2.4791, last eval raw return: 1017.19, last eval normalized score: 31.88
+Evaluation scores over iterations: [43.2350962742729, 25.446632503974186, 31.876970765718244]
+Raw returns over iterations: [1386.8451643825726, 807.906749029472, 1017.1867572140125]
+Saved raw return evaluation plot to sbatch_scripts/logs/RLFT_array_test/beta_0.0/adv_1/plots/hopper-medium-v2_eval_raw_return_25-12-09-15-14-34.png
+Saved normalized evaluation plot to sbatch_scripts/logs/RLFT_array_test/beta_0.0/adv_1/plots/hopper-medium-v2_eval_25-12-09-15-14-34.png
+Saved training loss plot to sbatch_scripts/logs/RLFT_array_test/beta_0.0/adv_1/plots/hopper-medium-v2_training_losses_25-12-09-15-14-34.png
+Saved training stats plot to sbatch_scripts/logs/RLFT_array_test/beta_0.0/adv_1/plots/hopper-medium-v2_training_stats_25-12-09-15-14-34.png
+============================================================
+finished training!
+Saved model checkpoint to models/RLFT_array_test/beta_0.0/adv_1/hopper-medium_rlft.pt
+finished training at: 25-12-09-15-17-39
+============================================================
+All plots for this run saved under: sbatch_scripts/logs/RLFT_array_test/beta_0.0/adv_1/plots
+Saved per-iteration training loss plot to sbatch_scripts/logs/RLFT_array_test/beta_0.0/adv_1/plots/hopper-medium-v2_training_losses_25-12-09-15-14-34.png
+Saved per-iteration training stats plot to sbatch_scripts/logs/RLFT_array_test/beta_0.0/adv_1/plots/hopper-medium-v2_training_stats_25-12-09-15-14-34.png
+Saved per-update training loss plot to sbatch_scripts/logs/RLFT_array_test/beta_0.0/adv_1/plots/hopper-medium-v2_training_losses_steps_25-12-09-15-14-34.png
+Saved per-update training stats plot to sbatch_scripts/logs/RLFT_array_test/beta_0.0/adv_1/plots/hopper-medium-v2_training_stats_steps_25-12-09-15-14-34.png
