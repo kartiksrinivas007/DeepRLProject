@@ -123,7 +123,7 @@ class ReinFormerTrainer:
         entropy = actions_dist_preds.entropy().sum(axis=2).mean()
         action_loss = -(log_likelihood + self.model.temperature().detach() * entropy)
 
-        rl_loss = 0.0
+        rl_loss = torch.tensor(0.0, device=self.device)
         if beta_rl > 0.0:
             # Advantage-weighted policy improvement (AWAC-style).
             adv = returns_to_go_target - returns_to_go_preds.detach()
@@ -169,6 +169,7 @@ class ReinFormerTrainer:
                 "returns_to_go_loss": returns_to_go_loss.detach().cpu().item(),
                 "action_loss": action_loss.detach().cpu().item(),
                 "temperature_loss": temperature_loss.detach().cpu().item(),
+                "rl_loss": rl_loss.detach().cpu().item(),
                 "entropy": entropy.detach().cpu().item(),
                 "temperature": self.model.temperature().detach().cpu().item(),
                 "grad_norm": float(total_norm),

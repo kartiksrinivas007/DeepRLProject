@@ -15,6 +15,9 @@ set -e
 cd "$SLURM_SUBMIT_DIR/.."
 
 TARGET_ENTROPY="${TARGET_ENTROPY:--3}"
+MODEL_DIR="models/hopper"
+mkdir -p "${MODEL_DIR}"
+MODEL_PATH="${MODEL_DIR}/hopper-medium_te${TARGET_ENTROPY}_seed2024.pt"
 
 echo "Running Reinformer Hopper-medium experiment with target_entropy=${TARGET_ENTROPY} on $(hostname)"
 date
@@ -26,7 +29,8 @@ python main.py \
   --num_eval_ep 15 \
   --max_eval_ep_len 1000 \
   --tau 0.999 \
-  --max_train_iters 15 \ 
-  --target_entropy "${TARGET_ENTROPY}"
+  --max_train_iters 15 \
+  --target_entropy "${TARGET_ENTROPY}" \
+  --save_model_path "${MODEL_PATH}"
 
 date

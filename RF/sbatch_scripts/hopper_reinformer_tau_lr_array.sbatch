@@ -9,7 +9,7 @@
 #SBATCH --time=06:00:00
 #SBATCH --output=logs/rf_hopper_tau_lr_%A_%a.out
 #SBATCH --error=logs/rf_hopper_tau_lr_%A_%a.err
-#SBATCH --array=0-8
+#SBATCH --array=0-1
 
 set -e
 
@@ -46,6 +46,7 @@ mkdir -p "${RUN_DIR}"
 PLOT_DIR="${RUN_DIR}/plots"
 mkdir -p "${PLOT_DIR}"
 LOG_BASE="${RUN_DIR}/run_${JOBID}_${TASK}"
+MODEL_PATH="${RUN_DIR}/model.pt"
 
 echo "------------------------------------------------------------"
 echo "Hopper-medium sweep | context_len=${CONTEXT_LEN} | n_blocks=${N_BLOCKS} | tau=${TAU} | lr=${LR} | target_entropy=${TARGET_ENTROPY}"
@@ -59,14 +60,15 @@ PLOT_RUN_DIR="${PLOT_DIR}" python main.py \
   --env hopper \
   --dataset medium \
   --dataset_dir data/d4rl_dataset/ \
-  --num_eval_ep 15 \
+  --num_eval_ep 20 \
   --max_eval_ep_len 1000 \
   --tau "${TAU}" \
-  --max_train_iters 15 \
+  --max_train_iters 3 \
   --context_len "${CONTEXT_LEN}" \
   --n_blocks "${N_BLOCKS}" \
   --lr "${LR}" \
   --target_entropy "${TARGET_ENTROPY}" \
+  --save_model_path "${MODEL_PATH}" \
   > "${LOG_BASE}.out" 2> "${LOG_BASE}.err"
 
 date

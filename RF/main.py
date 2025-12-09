@@ -547,6 +547,25 @@ def experiment(variant):
     normalized_d4rl_score_list = []
     raw_return_list = []
 
+    # Training diagnostics (per-iteration and per-update) for plotting/logging.
+    training_loss_list = []
+    rtg_loss_list = []
+    action_loss_list = []
+    temperature_loss_list = []
+    rl_loss_list = []
+    entropy_list = []
+    temperature_list = []
+    grad_norm_list = []
+
+    step_loss_list = []
+    step_rtg_loss_list = []
+    step_action_loss_list = []
+    step_temperature_loss_list = []
+    step_rl_loss_list = []
+    step_entropy_list = []
+    step_temperature_value_list = []
+    step_grad_norm_list = []
+
     # Optional initial evaluation before any training updates.
     if evaluator is not None:
         print("Running initial evaluation before training...")
@@ -571,6 +590,7 @@ def experiment(variant):
         rtg_loss_sum = 0.0
         action_loss_sum = 0.0
         temperature_loss_sum = 0.0
+        rl_loss_sum = 0.0
         entropy_sum = 0.0
         temperature_sum = 0.0
         grad_norm_sum = 0.0
@@ -597,7 +617,7 @@ def experiment(variant):
                     traj_mask,
                 ) = next(data_iter)
 
-            loss = Trainer.train_step(
+            loss, diag = Trainer.train_step(
                 timesteps=timesteps,
                 states=states,
                 actions=actions,
@@ -605,12 +625,53 @@ def experiment(variant):
                 rewards=rewards,
                 traj_mask=traj_mask
             )
+
+            # Accumulate diagnostics for this iteration.
+            total_loss_sum += loss
+            rtg_loss_sum += diag["returns_to_go_loss"]
+            action_loss_sum += diag["action_loss"]
+            temperature_loss_sum += diag["temperature_loss"]
+            rl_loss_sum += diag["rl_loss"]
+            entropy_sum += diag["entropy"]
+            temperature_sum += diag["temperature"]
+            grad_norm_sum += diag["grad_norm"]
+            num_updates += 1
+
+            # Fine-grained per-update diagnostics.
+            step_loss_list.append(loss)
+            step_rtg_loss_list.append(diag["returns_to_go_loss"])
+            step_action_loss_list.append(diag["action_loss"])
+            step_temperature_loss_list.append(diag["temperature_loss"])
+            step_rl_loss_list.append(diag["rl_loss"])
+            step_entropy_list.append(diag["entropy"])
+            step_temperature_value_list.append(diag["temperature"])
+            step_grad_norm_list.append(diag["grad_norm"])
+
             if args.use_wandb:
                 wandb.log(
                     data={
-                        "training/loss" : loss,
+                        "training/loss": loss,
+                        "training/returns_to_go_loss": diag["returns_to_go_loss"],
+                        "training/action_loss": diag["action_loss"],
+                        "training/temperature_loss": diag["temperature_loss"],
+                        "training/rl_loss": diag["rl_loss"],
+                        "training/entropy": diag["entropy"],
+                        "training/temperature": diag["temperature"],
+                        "training/grad_norm": diag["grad_norm"],
                     }
                 )
+
+        # Per-iteration averages (used for coarse plots).
+        if num_updates > 0:
+            training_loss_list.append(total_loss_sum / num_updates)
+            rtg_loss_list.append(rtg_loss_sum / num_updates)
+            action_loss_list.append(action_loss_sum / num_updates)
+            temperature_loss_list.append(temperature_loss_sum / num_updates)
+            rl_loss_list.append(rl_loss_sum / num_updates)
+            entropy_list.append(entropy_sum / num_updates)
+            temperature_list.append(temperature_sum / num_updates)
+            grad_norm_list.append(grad_norm_sum / num_updates)
+
         t2 = time.time()
         if evaluator is not None:
             raw_return, normalized_d4rl_score = evaluator(model=Trainer.model)
@@ -672,15 +733,16 @@ def experiment(variant):
             rollout_env = eval_env
 
         for itr in tqdm(range(1, max_train_iters + 1), desc="Online iterations"):
-            # 1) Collect one rollout with stochastic policy (rsample).
-            new_traj = collect_online_trajectory(
-                model=Trainer.model,
-                env_for_rollout=rollout_env,
-                use_mean_action=False,
-            )
-            online_replay_buffer.append(new_traj)
-            if len(online_replay_buffer) > online_buffer_size:
-                online_replay_buffer.pop(0)
+            # 1) Collect rollouts with stochastic policy (rsample).
+            for _ in range(num_online_rollouts_per_iter):
+                new_traj = collect_online_trajectory(
+                    model=Trainer.model,
+                    env_for_rollout=rollout_env,
+                    use_mean_action=False,
+                )
+                online_replay_buffer.append(new_traj)
+                if len(online_replay_buffer) > online_buffer_size:
+                    online_replay_buffer.pop(0)
 
             # 2) Train for num_updates_per_iter minibatches from buffer.
             t1 = time.time()
@@ -698,7 +760,7 @@ def experiment(variant):
                     context_len=variant["context_len"],
                 )
 
-                loss = Trainer.train_step(
+                loss, diag = Trainer.train_step(
                     timesteps=timesteps,
                     states=states,
                     actions=actions,
@@ -708,6 +770,17 @@ def experiment(variant):
                     beta_rl=beta_rl,
                     adv_scale=adv_scale,
                 )
+
+                # Fine-grained per-update diagnostics for online phase as well.
+                step_loss_list.append(loss)
+                step_rtg_loss_list.append(diag["returns_to_go_loss"])
+                step_action_loss_list.append(diag["action_loss"])
+                step_temperature_loss_list.append(diag["temperature_loss"])
+                step_rl_loss_list.append(diag["rl_loss"])
+                step_entropy_list.append(diag["entropy"])
+                step_temperature_value_list.append(diag["temperature"])
+                step_grad_norm_list.append(diag["grad_norm"])
+
                 if args.use_wandb:
                     wandb.log(
                         data={
@@ -799,13 +872,20 @@ def experiment(variant):
         print("No online evaluation was performed (evaluation env not available).")
     print("=" * 60)
     print("finished training!")
-    # Optional checkpoint save
-    if args.save_model_path is not None:
-        try:
-            torch.save(Trainer.model.state_dict(), args.save_model_path)
-            print(f"Saved model checkpoint to {args.save_model_path}")
-        except Exception as e:
-            print(f"Warning: failed to save model checkpoint to {args.save_model_path}: {e}")
+    # Save final model checkpoint: use explicit path if provided,
+    # otherwise default to RF/models/<env>/<env>-<dataset>_seed<seed>.pt
+    save_path = args.save_model_path
+    if save_path is None:
+        default_dir = os.path.join("models", args.env)
+        os.makedirs(default_dir, exist_ok=True)
+        save_path = os.path.join(
+            default_dir, f"{args.env}-{args.dataset}_seed{args.seed}.pt"
+        )
+    try:
+        torch.save(Trainer.model.state_dict(), save_path)
+        print(f"Saved model checkpoint to {save_path}")
+    except Exception as e:
+        print(f"Warning: failed to save model checkpoint to {save_path}: {e}")
     end_time = datetime.now().replace(microsecond=0)
     end_time_str = end_time.strftime("%y-%m-%d-%H-%M-%S")
     print("finished training at: " + end_time_str)
@@ -835,6 +915,8 @@ def experiment(variant):
                 plt.plot(
                     iter_steps, temperature_loss_list, label="temperature_loss"
                 )
+            if rl_loss_list:
+                plt.plot(iter_steps, rl_loss_list, label="rl_loss")
             plt.xlabel("Training iteration")
             plt.ylabel("Loss")
             plt.title(f"Training losses (per-iteration) - {eval_env_id or d4rl_env}")
@@ -885,6 +967,7 @@ def experiment(variant):
             rtg_ma, x_rtg = moving_average(step_rtg_loss_list) if step_rtg_loss_list else (None, None)
             act_ma, x_act = moving_average(step_action_loss_list) if step_action_loss_list else (None, None)
             temp_ma, x_temp = moving_average(step_temperature_loss_list) if step_temperature_loss_list else (None, None)
+            rl_ma, x_rl = moving_average(step_rl_loss_list) if step_rl_loss_list else (None, None)
 
             fine_loss_plot_path = os.path.join(
                 plot_run_dir, f"{d4rl_env}_training_losses_steps_{start_time_str}.png"
@@ -897,6 +980,8 @@ def experiment(variant):
                 plt.plot(x_act, act_ma, label="action_loss_MA")
             if temp_ma is not None:
                 plt.plot(x_temp, temp_ma, label="temperature_loss_MA")
+            if rl_ma is not None:
+                plt.plot(x_rl, rl_ma, label="rl_loss_MA")
             plt.xlabel("Update step")
             plt.ylabel("Loss (moving average)")
             plt.title(
@@ -943,6 +1028,9 @@ if __name__ == "__main__":
     parser.add_argument("--model_type", choices=[ "reinformer"], default="reinformer")
     parser.add_argument("--env", type=str, default="antmaze")
     parser.add_argument("--dataset", type=str, default="medium-diverse")
+    # Optional target entropy for the policy temperature update.
+    # If not provided, the trainer will default to -act_dim.
+    parser.add_argument("--target_entropy", type=float, default=None)
     parser.add_argument("--num_eval_ep", type=int, default=30)
     parser.add_argument("--max_eval_ep_len", type=int, default=1000)
     parser.add_argument("--dataset_dir", type=str, default="data/d4rl_dataset/")
@@ -959,6 +1047,21 @@ if __name__ == "__main__":
     parser.add_argument("--warmup_steps", type=int, default=5000)
     parser.add_argument("--max_train_iters", type=int, default=10)
     parser.add_argument("--num_updates_per_iter", type=int, default=5000)
+    parser.add_argument(
+        "--save_model_path",
+        type=str,
+        default=None,
+        help=(
+            "Optional explicit path to save the final model checkpoint. "
+            "If not provided, a default under RF/models/<env>/ will be used."
+        ),
+    )
+    parser.add_argument(
+        "--pretrained_model",
+        type=str,
+        default=None,
+        help="Optional path to a pretrained checkpoint to load before online finetuning.",
+    )
     parser.add_argument("--device", type=str, default="cuda")
     parser.add_argument("--seed", type=int, default=2024)
     parser.add_argument("--init_temperature", type=float, default=0.1)

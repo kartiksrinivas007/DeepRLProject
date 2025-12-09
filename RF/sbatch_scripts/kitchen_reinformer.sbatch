@@ -14,6 +14,10 @@ set -e
 
 cd "$SLURM_SUBMIT_DIR/.."
 
+MODEL_DIR="models/kitchen"
+mkdir -p "${MODEL_DIR}"
+MODEL_PATH="${MODEL_DIR}/kitchen-mixed_seed2024.pt"
+
 echo "Running Reinformer Kitchen-mixed experiment on $(hostname)"
 date
 
@@ -25,6 +29,7 @@ python main.py \
   --tau 0.9 \
   --n_blocks 5 \
   --max_train_iters 10 \
-  --num_updates_per_iter 5000
+  --num_updates_per_iter 5000 \
+  --save_model_path "${MODEL_PATH}"
 
 date

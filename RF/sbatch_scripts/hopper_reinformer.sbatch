@@ -14,6 +14,10 @@ set -e
 
 cd "$SLURM_SUBMIT_DIR/.."
 
+MODEL_DIR="models/hopper"
+mkdir -p "${MODEL_DIR}"
+MODEL_PATH="${MODEL_DIR}/hopper-medium_base_seed2024.pt"
+
 echo "Running Reinformer Hopper-medium experiment on $(hostname)"
 date
 
@@ -24,6 +28,7 @@ python main.py \
   --num_eval_ep 10 \
   --max_eval_ep_len 1000 \
   --tau 0.999 \
-  --max_train_iters 6
+  --max_train_iters 6 \
+  --save_model_path "${MODEL_PATH}"
 
 date

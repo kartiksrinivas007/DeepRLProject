@@ -1,0 +1,22 @@
+============================================================
+start time: 25-12-09-00-24-37
+============================================================
+dataset size: 1327
+returns max : 3908.8544921875
+returns mean: 2817.7890625
+returns std : 877.09326171875
+returns min : 1350.3359375
+Using Minari eval environment: Hopper-v5
+Running initial evaluation before training...
+Iteration 1/3 - last training loss: 2.5888, last eval raw return: 423.69, last eval normalized score: 13.64
+Iteration 2/3 - last training loss: 2.6630, last eval raw return: 2399.79, last eval normalized score: 74.36
+Iteration 3/3 - last training loss: 2.7210, last eval raw return: 3134.36, last eval normalized score: 96.93
+[Online] Iteration 1/3 - last training loss: 2.7513, last eval raw return: 1223.45, last eval normalized score: 38.21
+[Online] Iteration 2/3 - last training loss: 2.7731, last eval raw return: 1263.80, last eval normalized score: 39.45
+[Online] Iteration 3/3 - last training loss: 2.7755, last eval raw return: 43.73, last eval normalized score: 1.97
+Evaluation scores over iterations: [0.7374859802229529, 13.641098785020079, 74.35891205885564, 96.92916318206429, 38.21468029361129, 39.45439855726621, 1.9664221774812787]
+Raw returns over iterations: [3.7297094655940035, 423.687118154955, 2399.792253166821, 3134.357395391721, 1223.4520962801657, 1263.7996235491057, 43.726326587683644]
+Saved raw return evaluation plot to sbatch_scripts/logs/tau_lr/K_20/enc_6/tau_0.99/lr_4e-4/plots/hopper-medium-v2_eval_raw_return_25-12-09-00-24-37.png
+Saved normalized evaluation plot to sbatch_scripts/logs/tau_lr/K_20/enc_6/tau_0.99/lr_4e-4/plots/hopper-medium-v2_eval_25-12-09-00-24-37.png
+============================================================
+finished training!

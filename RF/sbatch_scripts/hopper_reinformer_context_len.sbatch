@@ -15,6 +15,9 @@ set -e
 cd "$SLURM_SUBMIT_DIR/.."
 
 CONTEXT_LEN="${CONTEXT_LEN:-5}"
+MODEL_DIR="models/hopper"
+mkdir -p "${MODEL_DIR}"
+MODEL_PATH="${MODEL_DIR}/hopper-medium_K${CONTEXT_LEN}_seed2024.pt"
 
 echo "Running Reinformer Hopper-medium with context_len=${CONTEXT_LEN} on $(hostname)"
 date
@@ -27,7 +30,7 @@ python main.py \
   --max_eval_ep_len 1000 \
   --tau 0.999 \
   --max_train_iters 15 \
-  --context_len "${CONTEXT_LEN}"
+  --context_len "${CONTEXT_LEN}" \
+  --save_model_path "${MODEL_PATH}"
 
 date
-

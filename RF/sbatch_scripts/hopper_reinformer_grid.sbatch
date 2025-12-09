@@ -37,6 +37,7 @@ for k in "${CONTEXT_LENS[@]}"; do
         RUN_DIR="${LOG_ROOT}/K_${k}/enc_${enc}/lr_${lr}/te_${te}"
         mkdir -p "${RUN_DIR}"
         LOG_BASE="${RUN_DIR}/run_${JOBID}"
+        MODEL_PATH="${RUN_DIR}/model.pt"
 
         echo "------------------------------------------------------------"
         echo "context_len=${k} | n_blocks=${enc} | lr=${lr} | target_entropy=${te}"
@@ -55,6 +56,7 @@ for k in "${CONTEXT_LENS[@]}"; do
           --n_blocks "${enc}" \
           --lr "${lr}" \
           --target_entropy "${te}" \
+          --save_model_path "${MODEL_PATH}" \
           > "${LOG_BASE}.out" 2> "${LOG_BASE}.err"
       done
     done

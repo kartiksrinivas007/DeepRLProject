@@ -49,6 +49,7 @@ mkdir -p "${RUN_DIR}"
 PLOT_DIR="${RUN_DIR}/plots"
 mkdir -p "${PLOT_DIR}"
 LOG_BASE="${RUN_DIR}/run_${JOBID}_${TASK}"
+MODEL_PATH="${RUN_DIR}/model.pt"
 
 echo "------------------------------------------------------------"
 echo "TEST grid | context_len=${K} | n_blocks=${ENC} | lr=${LR} | target_entropy=${TE}"
@@ -70,6 +71,7 @@ PLOT_RUN_DIR="${PLOT_DIR}" python main.py \
   --n_blocks "${ENC}" \
   --lr "${LR}" \
   --target_entropy "${TE}" \
+  --save_model_path "${MODEL_PATH}" \
   > "${LOG_BASE}.out" 2> "${LOG_BASE}.err"
 
 date

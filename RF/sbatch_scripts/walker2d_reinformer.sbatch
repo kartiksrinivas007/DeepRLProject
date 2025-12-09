@@ -14,6 +14,10 @@ set -e
 
 cd "$SLURM_SUBMIT_DIR/.."
 
+MODEL_DIR="models/walker2d"
+mkdir -p "${MODEL_DIR}"
+MODEL_PATH="${MODEL_DIR}/walker2d-medium_seed2024.pt"
+
 echo "Running Reinformer Walker2d-medium experiment on $(hostname)"
 date
 
@@ -26,6 +30,7 @@ python main.py \
   --lr 1e-4 \
   --max_train_iters 3 \
   --num_updates_per_iter 5000 \
-  --n_blocks 4
+  --n_blocks 4 \
+  --save_model_path "${MODEL_PATH}"
 
 date
