@@ -1,9 +1,0 @@
-------------------------------------------------------------
-TEST Array task 1: beta_rl=0.66 | adv_scale=8
-pretrained: sbatch_scripts/logs/tau_lr/K_20/enc_6/tau_0.99/lr_4e-4/model.pt
-logs: sbatch_scripts/logs/RLFT_array_test/beta_0.66/adv_8/run_5870990_1.out / sbatch_scripts/logs/RLFT_array_test/beta_0.66/adv_8/run_5870990_1.err
-plots: sbatch_scripts/logs/RLFT_array_test/beta_0.66/adv_8/plots
-model: models/RLFT_array_test/beta_0.66/adv_8/hopper-medium_rlft.pt
-------------------------------------------------------------
-Tue Dec  9 15:14:31 EST 2025
-Tue Dec  9 15:17:45 EST 2025

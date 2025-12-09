@@ -1,7 +1,0 @@
-------------------------------------------------------------
-Running Hopper-medium | context_len=5 | n_blocks=6 | lr=1e-4 | target_entropy=-3
-logs: sbatch_scripts/logs/grid_array/K_5/enc_6/lr_1e-4/te_-3/run_5863097_10.out / sbatch_scripts/logs/grid_array/K_5/enc_6/lr_1e-4/te_-3/run_5863097_10.err
-plots dir: sbatch_scripts/logs/grid_array/K_5/enc_6/lr_1e-4/te_-3/plots
-Array task: 10 of 40
-------------------------------------------------------------
-Sun Dec  7 13:58:58 EST 2025
