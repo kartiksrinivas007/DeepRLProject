@@ -6,7 +6,7 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=4
-#SBATCH --gres=gpu:L40S:1
+#SBATCH --gres=gpu:1
 #SBATCH --mem=40G
 #SBATCH --time=06:00:00
 #SBATCH --output=logs/rf_hopper_online_mod_%j.out

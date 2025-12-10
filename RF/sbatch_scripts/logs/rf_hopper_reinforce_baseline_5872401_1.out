@@ -1,0 +1,10 @@
+------------------------------------------------------------
+REINFORCE (with baseline) online finetuning on Hopper-medium
+pretrained: sbatch_scripts/logs/tau_lr/K_20/enc_6/tau_0.99/lr_4e-4/model.pt
+buffer_size=500, rollouts/iter=5, updates/iter=1
+mode: no_buffer, tau=0.5
+logs: sbatch_scripts/logs/reinforce_online_baseline/tau_0.5/no_buffer/rollouts_5_updates_1/run_5872401_1.out / sbatch_scripts/logs/reinforce_online_baseline/tau_0.5/no_buffer/rollouts_5_updates_1/run_5872401_1.err
+plots: sbatch_scripts/logs/reinforce_online_baseline/tau_0.5/no_buffer/rollouts_5_updates_1/plots
+model: models/reinforce_online_baseline/tau_0.5/no_buffer/rollouts_5_updates_1/hopper-medium_reinforce_baseline.pt
+------------------------------------------------------------
+Tue Dec  9 23:32:46 EST 2025

@@ -1,0 +1,10 @@
+------------------------------------------------------------
+Array task 0: buffer_size=1000, rollouts_per_iter=200
+pretrained: sbatch_scripts/logs/tau_lr/K_20/enc_6/tau_0.99/lr_4e-4/model.pt
+logs: sbatch_scripts/logs/RLFT_ablate/buffer_1000_rollouts_200/run_5871483_0.out / sbatch_scripts/logs/RLFT_ablate/buffer_1000_rollouts_200/run_5871483_0.err
+plots: sbatch_scripts/logs/RLFT_ablate/buffer_1000_rollouts_200/plots
+model: models/RLFT_ablate/buffer_1000_rollouts_200/hopper-medium_rlft.pt
+------------------------------------------------------------
+Tue Dec  9 17:43:42 EST 2025
+Tue Dec  9 18:15:22 EST 2025
+Ablation task 0 completed.

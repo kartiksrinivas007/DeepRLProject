@@ -7,7 +7,7 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=4
-#SBATCH --gres=gpu:L40S:1
+#SBATCH --gres=gpu:1
 #SBATCH --mem=40G
 #SBATCH --time=02:00:00
 #SBATCH --output=logs/rf_hopper_rlft_test_%A_%a.out
@@ -59,8 +59,8 @@ PLOT_RUN_DIR="${PLOT_DIR}" python main.py \
   --num_eval_ep 10 \
   --max_eval_ep_len 1000 \
   --tau 0.999 \
-  --max_train_iters 3 \
-  --num_updates_per_iter 1000 \
+  --max_train_iters 30 \
+  --num_updates_per_iter 300 \
   --context_len "${CONTEXT_LEN}" \
   --n_blocks "${N_BLOCKS}" \
   --target_entropy -3 \

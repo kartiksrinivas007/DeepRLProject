@@ -1,0 +1,9 @@
+------------------------------------------------------------
+Array task 6: beta_rl=0.0 | adv_scale=8 | updates_per_iter=300
+pretrained: sbatch_scripts/logs/tau_lr/K_20/enc_6/tau_0.99/lr_4e-4/model.pt
+logs: sbatch_scripts/logs/RLFT_array/beta_0.0/adv_8/updates_300/run_5871202_6.out / sbatch_scripts/logs/RLFT_array/beta_0.0/adv_8/updates_300/run_5871202_6.err
+plots: sbatch_scripts/logs/RLFT_array/beta_0.0/adv_8/updates_300/plots
+model: models/RLFT_array/beta_0.0/adv_8/hopper-medium_rlft.pt
+------------------------------------------------------------
+Tue Dec  9 17:08:16 EST 2025
+Tue Dec  9 17:31:00 EST 2025

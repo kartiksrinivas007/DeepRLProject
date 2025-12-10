@@ -4,7 +4,9 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=4
-#SBATCH --gres=gpu:L40S:1
+# Prefer high-end GPUs (A100/A6000). Adjust the constraint if your cluster uses different labels.
+#SBATCH --gres=gpu:1
+#SBATCH --constraint="a100|a6000"
 #SBATCH --mem=40G
 #SBATCH --time=06:00:00
 #SBATCH --output=logs/rf_hopper_tau_lr_%A_%a.out

@@ -11,18 +11,18 @@
 #SBATCH --cpus-per-task=4
 #SBATCH --gres=gpu:L40S:1
 #SBATCH --mem=40G
-#SBATCH --time=06:00:00
+#SBATCH --time=12:00:00
 #SBATCH --output=logs/rf_hopper_rlft_%A_%a.out
 #SBATCH --error=logs/rf_hopper_rlft_%A_%a.err
-#SBATCH --array=0-74
+#SBATCH --array=0-35
 
 set -euo pipefail
 
 cd "$SLURM_SUBMIT_DIR/.."
 
-BETAS=(0.0 0.33 0.66 0.99 1.0)
-ADV_SCALES=(1 2 4 8 16)
-UPDATES=(1000 3000 5000)
+BETAS=(0.0 0.66 1.0)
+ADV_SCALES=(1 4 8 16)
+UPDATES=(300 1000 3000)
 
 NUM_B=${#BETAS[@]}
 NUM_A=${#ADV_SCALES[@]}
@@ -71,7 +71,7 @@ PLOT_RUN_DIR="${PLOT_DIR}" python main.py \
   --num_eval_ep 15 \
   --max_eval_ep_len 1000 \
   --tau 0.999 \
-  --max_train_iters 15 \
+  --max_train_iters 30 \
   --num_updates_per_iter "${updates}" \
   --context_len "${CONTEXT_LEN}" \
   --n_blocks "${N_BLOCKS}" \

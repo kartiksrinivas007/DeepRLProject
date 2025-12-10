@@ -1,0 +1,43 @@
+============================================================
+start time: 25-12-09-22-34-09
+============================================================
+dataset size: 1327
+returns max : 3908.8544921875
+returns mean: 2817.7890625
+returns std : 877.09326171875
+returns min : 1350.3359375
+Using Minari eval environment: Hopper-v5
+Loaded pretrained model from sbatch_scripts/logs/tau_lr/K_20/enc_6/tau_0.99/lr_4e-4/model.pt
+Running initial evaluation before training...
+[Online] Iteration 1/15 - last training loss: 0.5079, last eval raw return: 2761.20, last eval normalized score: 85.46
+[Online] Iteration 2/15 - last training loss: 0.5594, last eval raw return: 1143.20, last eval normalized score: 35.75
+[Online] Iteration 3/15 - last training loss: 0.5953, last eval raw return: 1017.42, last eval normalized score: 31.88
+[Online] Iteration 4/15 - last training loss: 0.4712, last eval raw return: 1051.84, last eval normalized score: 32.94
+[Online] Iteration 5/15 - last training loss: 0.5258, last eval raw return: 942.09, last eval normalized score: 29.57
+[Online] Iteration 6/15 - last training loss: 0.5041, last eval raw return: 108.87, last eval normalized score: 3.97
+[Online] Iteration 7/15 - last training loss: 0.4599, last eval raw return: 91.97, last eval normalized score: 3.45
+[Online] Iteration 8/15 - last training loss: 0.4965, last eval raw return: 145.46, last eval normalized score: 5.09
+[Online] Iteration 9/15 - last training loss: 0.4246, last eval raw return: 543.89, last eval normalized score: 17.33
+[Online] Iteration 10/15 - last training loss: 0.3890, last eval raw return: 458.89, last eval normalized score: 14.72
+[Online] Iteration 11/15 - last training loss: 0.3650, last eval raw return: 590.42, last eval normalized score: 18.76
+[Online] Iteration 12/15 - last training loss: 0.3917, last eval raw return: 556.96, last eval normalized score: 17.74
+[Online] Iteration 13/15 - last training loss: 0.3617, last eval raw return: 767.16, last eval normalized score: 24.19
+[Online] Iteration 14/15 - last training loss: 0.3745, last eval raw return: 680.68, last eval normalized score: 21.54
+[Online] Iteration 15/15 - last training loss: 0.3745, last eval raw return: 579.23, last eval normalized score: 18.42
+Evaluation scores over iterations: [90.61156121215467, 85.46354291377834, 35.74890653012654, 31.884007311042357, 32.94184687197955, 29.56954691224366, 3.967963564987979, 3.448874944580925, 5.092326193852827, 17.334378716655312, 14.722848443621226, 18.76412274504757, 17.73614251182602, 24.194639920711538, 21.53745412477292, 18.420457493664124]
+Raw returns over iterations: [2928.746471338908, 2761.20049354362, 1143.2017062698349, 1017.4157666693596, 1051.8439200509551, 942.089979519865, 108.86793825858948, 91.97382378041488, 145.46113298539476, 543.8875839560783, 458.8934429532199, 590.4196371365241, 556.963277165221, 767.1597451539518, 680.6797121469398, 579.2348030430898]
+Saved raw return evaluation plot to sbatch_scripts/logs/reinforce_online/buffered/rollouts_10_updates_1000/plots/hopper-medium-v2_eval_raw_return_25-12-09-22-34-09.png
+Saved normalized evaluation plot to sbatch_scripts/logs/reinforce_online/buffered/rollouts_10_updates_1000/plots/hopper-medium-v2_eval_25-12-09-22-34-09.png
+Saved training loss plot to sbatch_scripts/logs/reinforce_online/buffered/rollouts_10_updates_1000/plots/hopper-medium-v2_training_losses_25-12-09-22-34-09.png
+Saved training stats plot to sbatch_scripts/logs/reinforce_online/buffered/rollouts_10_updates_1000/plots/hopper-medium-v2_training_stats_25-12-09-22-34-09.png
+============================================================
+finished training!
+Saved model checkpoint to models/reinforce_online/buffered/rollouts_10_updates_1000/hopper-medium_reinforce.pt
+finished training at: 25-12-09-22-48-27
+============================================================
+Model checkpoint path: models/reinforce_online/buffered/rollouts_10_updates_1000/hopper-medium_reinforce.pt
+All plots for this run saved under: sbatch_scripts/logs/reinforce_online/buffered/rollouts_10_updates_1000/plots
+Saved per-iteration training loss plot to sbatch_scripts/logs/reinforce_online/buffered/rollouts_10_updates_1000/plots/hopper-medium-v2_training_losses_25-12-09-22-34-09.png
+Saved per-iteration training stats plot to sbatch_scripts/logs/reinforce_online/buffered/rollouts_10_updates_1000/plots/hopper-medium-v2_training_stats_25-12-09-22-34-09.png
+Saved per-update training loss plot to sbatch_scripts/logs/reinforce_online/buffered/rollouts_10_updates_1000/plots/hopper-medium-v2_training_losses_steps_25-12-09-22-34-09.png
+Saved per-update training stats plot to sbatch_scripts/logs/reinforce_online/buffered/rollouts_10_updates_1000/plots/hopper-medium-v2_training_stats_steps_25-12-09-22-34-09.png
