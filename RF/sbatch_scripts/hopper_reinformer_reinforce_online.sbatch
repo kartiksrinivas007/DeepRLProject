@@ -24,10 +24,12 @@ N_BLOCKS=6
 ONLINE_BUFFER_SIZE=500   # buffer will be filled only with fresh rollouts
 NUM_ROLLOUTS_PER_ITER=5
 NUM_UPDATES_PER_ITER=1
-MAX_TRAIN_ITERS=150
+MAX_TRAIN_ITERS=300
 RTG_GAMMA=0.99
+CRITIC_COEF=1.0
 
 TAU=0.999
+CRITIC_COEF=1.0
 
 NO_BUFFER_FLAG=""
 RUN_NAME="buffered"
@@ -37,9 +39,9 @@ if [[ "${SLURM_ARRAY_TASK_ID:-0}" -eq 1 ]]; then
 fi
 
 LOG_ROOT="sbatch_scripts/logs/reinforce_online"
-RUN_DIR="${LOG_ROOT}/${RUN_NAME}/rollouts_${NUM_ROLLOUTS_PER_ITER}_updates_${NUM_UPDATES_PER_ITER}"
+RUN_DIR="${LOG_ROOT}/${RUN_NAME}/rollouts_${NUM_ROLLOUTS_PER_ITER}_updates_${NUM_UPDATES_PER_ITER}/iters_${MAX_TRAIN_ITERS}"
 PLOT_DIR="${RUN_DIR}/plots"
-MODEL_DIR="models/reinforce_online/${RUN_NAME}/rollouts_${NUM_ROLLOUTS_PER_ITER}_updates_${NUM_UPDATES_PER_ITER}"
+MODEL_DIR="models/reinforce_online/${RUN_NAME}/rollouts_${NUM_ROLLOUTS_PER_ITER}_updates_${NUM_UPDATES_PER_ITER}/iters_${MAX_TRAIN_ITERS}"
 
 mkdir -p "${RUN_DIR}" "${PLOT_DIR}" "${MODEL_DIR}"
 
@@ -50,7 +52,7 @@ echo "------------------------------------------------------------"
 echo "REINFORCE online finetuning on Hopper-medium"
 echo "pretrained: ${PRETRAINED_MODEL}"
 echo "buffer_size=${ONLINE_BUFFER_SIZE}, rollouts/iter=${NUM_ROLLOUTS_PER_ITER}, updates/iter=${NUM_UPDATES_PER_ITER}"
-echo "mode: ${RUN_NAME}, tau=${TAU}"
+echo "mode: ${RUN_NAME}, tau=${TAU}, critic_coef=${CRITIC_COEF}"
 echo "logs: ${LOG_BASE}.out / ${LOG_BASE}.err"
 echo "plots: ${PLOT_DIR}"
 echo "model: ${MODEL_PATH}"
@@ -72,6 +74,7 @@ PLOT_RUN_DIR="${PLOT_DIR}" python main.py \
   --context_len "${CONTEXT_LEN}" \
   --n_blocks "${N_BLOCKS}" \
   --target_entropy -3 \
+  --critic_coef "${CRITIC_COEF}" \
   --reinforce_online \
   ${NO_BUFFER_FLAG} \
   --pretrained_model "${PRETRAINED_MODEL}" \

@@ -9,3 +9,170 @@ returns min : 1350.3359375
 Using Minari eval environment: Hopper-v5
 Loaded pretrained model from sbatch_scripts/logs/tau_lr/K_20/enc_6/tau_0.99/lr_4e-4/model.pt
 Running initial evaluation before training...
+[Online] Iteration 1/150 - last training loss: 0.4683, last eval raw return: 3166.33, last eval normalized score: 97.91
+[Online] Iteration 2/150 - last training loss: 0.4643, last eval raw return: 3336.20, last eval normalized score: 103.13
+[Online] Iteration 3/150 - last training loss: 0.4466, last eval raw return: 3288.82, last eval normalized score: 101.68
+[Online] Iteration 4/150 - last training loss: 0.4340, last eval raw return: 3199.11, last eval normalized score: 98.92
+[Online] Iteration 5/150 - last training loss: 0.4514, last eval raw return: 3041.79, last eval normalized score: 94.09
+[Online] Iteration 6/150 - last training loss: 0.4619, last eval raw return: 3203.55, last eval normalized score: 99.06
+[Online] Iteration 7/150 - last training loss: 0.4717, last eval raw return: 3054.05, last eval normalized score: 94.46
+[Online] Iteration 8/150 - last training loss: 0.4267, last eval raw return: 3102.67, last eval normalized score: 95.96
+[Online] Iteration 9/150 - last training loss: 0.4073, last eval raw return: 2824.84, last eval normalized score: 87.42
+[Online] Iteration 10/150 - last training loss: 0.4348, last eval raw return: 3184.19, last eval normalized score: 98.46
+[Online] Iteration 11/150 - last training loss: 0.4456, last eval raw return: 3341.18, last eval normalized score: 103.28
+[Online] Iteration 12/150 - last training loss: 0.4539, last eval raw return: 3168.54, last eval normalized score: 97.98
+[Online] Iteration 13/150 - last training loss: 0.4335, last eval raw return: 3044.53, last eval normalized score: 94.17
+[Online] Iteration 14/150 - last training loss: 0.4711, last eval raw return: 3042.46, last eval normalized score: 94.11
+[Online] Iteration 15/150 - last training loss: 0.4560, last eval raw return: 3190.42, last eval normalized score: 98.65
+[Online] Iteration 16/150 - last training loss: 0.4580, last eval raw return: 3252.44, last eval normalized score: 100.56
+[Online] Iteration 17/150 - last training loss: 0.4437, last eval raw return: 2932.22, last eval normalized score: 90.72
+[Online] Iteration 18/150 - last training loss: 0.4235, last eval raw return: 2927.47, last eval normalized score: 90.57
+[Online] Iteration 19/150 - last training loss: 0.4737, last eval raw return: 3297.54, last eval normalized score: 101.94
+[Online] Iteration 20/150 - last training loss: 0.4354, last eval raw return: 2915.52, last eval normalized score: 90.21
+[Online] Iteration 21/150 - last training loss: 0.4231, last eval raw return: 3221.22, last eval normalized score: 99.60
+[Online] Iteration 22/150 - last training loss: 0.4282, last eval raw return: 2853.14, last eval normalized score: 88.29
+[Online] Iteration 23/150 - last training loss: 0.4527, last eval raw return: 3170.90, last eval normalized score: 98.05
+[Online] Iteration 24/150 - last training loss: 0.4375, last eval raw return: 3012.47, last eval normalized score: 93.18
+[Online] Iteration 25/150 - last training loss: 0.4268, last eval raw return: 3045.27, last eval normalized score: 94.19
+[Online] Iteration 26/150 - last training loss: 0.4623, last eval raw return: 3041.29, last eval normalized score: 94.07
+[Online] Iteration 27/150 - last training loss: 0.4438, last eval raw return: 3175.02, last eval normalized score: 98.18
+[Online] Iteration 28/150 - last training loss: 0.4488, last eval raw return: 2615.34, last eval normalized score: 80.98
+[Online] Iteration 29/150 - last training loss: 0.4525, last eval raw return: 3309.20, last eval normalized score: 102.30
+[Online] Iteration 30/150 - last training loss: 0.4667, last eval raw return: 3254.85, last eval normalized score: 100.63
+[Online] Iteration 31/150 - last training loss: 0.4424, last eval raw return: 2706.38, last eval normalized score: 83.78
+[Online] Iteration 32/150 - last training loss: 0.4302, last eval raw return: 3111.74, last eval normalized score: 96.23
+[Online] Iteration 33/150 - last training loss: 0.4240, last eval raw return: 3399.39, last eval normalized score: 105.07
+[Online] Iteration 34/150 - last training loss: 0.4538, last eval raw return: 3486.57, last eval normalized score: 107.75
+[Online] Iteration 35/150 - last training loss: 0.4575, last eval raw return: 3124.27, last eval normalized score: 96.62
+[Online] Iteration 36/150 - last training loss: 0.4442, last eval raw return: 3407.48, last eval normalized score: 105.32
+[Online] Iteration 37/150 - last training loss: 0.4478, last eval raw return: 3311.64, last eval normalized score: 102.38
+[Online] Iteration 38/150 - last training loss: 0.4424, last eval raw return: 3177.49, last eval normalized score: 98.25
+[Online] Iteration 39/150 - last training loss: 0.4721, last eval raw return: 3173.48, last eval normalized score: 98.13
+[Online] Iteration 40/150 - last training loss: 0.4357, last eval raw return: 3217.10, last eval normalized score: 99.47
+[Online] Iteration 41/150 - last training loss: 0.4413, last eval raw return: 3155.01, last eval normalized score: 97.56
+[Online] Iteration 42/150 - last training loss: 0.4028, last eval raw return: 2999.10, last eval normalized score: 92.77
+[Online] Iteration 43/150 - last training loss: 0.4444, last eval raw return: 3341.31, last eval normalized score: 103.29
+[Online] Iteration 44/150 - last training loss: 0.4073, last eval raw return: 3055.51, last eval normalized score: 94.51
+[Online] Iteration 45/150 - last training loss: 0.4549, last eval raw return: 3179.22, last eval normalized score: 98.31
+[Online] Iteration 46/150 - last training loss: 0.4289, last eval raw return: 3016.06, last eval normalized score: 93.29
+[Online] Iteration 47/150 - last training loss: 0.4517, last eval raw return: 3107.19, last eval normalized score: 96.09
+[Online] Iteration 48/150 - last training loss: 0.4433, last eval raw return: 3194.56, last eval normalized score: 98.78
+[Online] Iteration 49/150 - last training loss: 0.4455, last eval raw return: 3122.67, last eval normalized score: 96.57
+[Online] Iteration 50/150 - last training loss: 0.4598, last eval raw return: 3469.89, last eval normalized score: 107.24
+[Online] Iteration 51/150 - last training loss: 0.4312, last eval raw return: 2947.57, last eval normalized score: 91.19
+[Online] Iteration 52/150 - last training loss: 0.4395, last eval raw return: 3168.44, last eval normalized score: 97.98
+[Online] Iteration 53/150 - last training loss: 0.4373, last eval raw return: 3341.53, last eval normalized score: 103.29
+[Online] Iteration 54/150 - last training loss: 0.4611, last eval raw return: 3147.29, last eval normalized score: 97.33
+[Online] Iteration 55/150 - last training loss: 0.4225, last eval raw return: 3194.72, last eval normalized score: 98.78
+[Online] Iteration 56/150 - last training loss: 0.4478, last eval raw return: 3173.78, last eval normalized score: 98.14
+[Online] Iteration 57/150 - last training loss: 0.4617, last eval raw return: 3307.53, last eval normalized score: 102.25
+[Online] Iteration 58/150 - last training loss: 0.4470, last eval raw return: 3149.11, last eval normalized score: 97.38
+[Online] Iteration 59/150 - last training loss: 0.4504, last eval raw return: 3487.42, last eval normalized score: 107.78
+[Online] Iteration 60/150 - last training loss: 0.4348, last eval raw return: 2785.01, last eval normalized score: 86.20
+[Online] Iteration 61/150 - last training loss: 0.4439, last eval raw return: 3479.02, last eval normalized score: 107.52
+[Online] Iteration 62/150 - last training loss: 0.4319, last eval raw return: 2597.79, last eval normalized score: 80.44
+[Online] Iteration 63/150 - last training loss: 0.4198, last eval raw return: 3353.78, last eval normalized score: 103.67
+[Online] Iteration 64/150 - last training loss: 0.4172, last eval raw return: 3202.46, last eval normalized score: 99.02
+[Online] Iteration 65/150 - last training loss: 0.4118, last eval raw return: 3480.97, last eval normalized score: 107.58
+[Online] Iteration 66/150 - last training loss: 0.4316, last eval raw return: 3276.02, last eval normalized score: 101.28
+[Online] Iteration 67/150 - last training loss: 0.4311, last eval raw return: 3481.08, last eval normalized score: 107.58
+[Online] Iteration 68/150 - last training loss: 0.4432, last eval raw return: 2690.94, last eval normalized score: 83.30
+[Online] Iteration 69/150 - last training loss: 0.4433, last eval raw return: 2925.35, last eval normalized score: 90.51
+[Online] Iteration 70/150 - last training loss: 0.4226, last eval raw return: 3175.24, last eval normalized score: 98.19
+[Online] Iteration 71/150 - last training loss: 0.4436, last eval raw return: 2742.20, last eval normalized score: 84.88
+[Online] Iteration 72/150 - last training loss: 0.4017, last eval raw return: 3188.90, last eval normalized score: 98.61
+[Online] Iteration 73/150 - last training loss: 0.4346, last eval raw return: 3045.07, last eval normalized score: 94.19
+[Online] Iteration 74/150 - last training loss: 0.4514, last eval raw return: 3509.62, last eval normalized score: 108.46
+[Online] Iteration 75/150 - last training loss: 0.4398, last eval raw return: 3151.68, last eval normalized score: 97.46
+[Online] Iteration 76/150 - last training loss: 0.4340, last eval raw return: 3316.19, last eval normalized score: 102.52
+[Online] Iteration 77/150 - last training loss: 0.4294, last eval raw return: 3349.74, last eval normalized score: 103.55
+[Online] Iteration 78/150 - last training loss: 0.4191, last eval raw return: 2986.11, last eval normalized score: 92.37
+[Online] Iteration 79/150 - last training loss: 0.4114, last eval raw return: 3226.37, last eval normalized score: 99.76
+[Online] Iteration 80/150 - last training loss: 0.4172, last eval raw return: 3461.45, last eval normalized score: 106.98
+[Online] Iteration 81/150 - last training loss: 0.4409, last eval raw return: 3337.90, last eval normalized score: 103.18
+[Online] Iteration 82/150 - last training loss: 0.4255, last eval raw return: 3196.58, last eval normalized score: 98.84
+[Online] Iteration 83/150 - last training loss: 0.4289, last eval raw return: 3346.01, last eval normalized score: 103.43
+[Online] Iteration 84/150 - last training loss: 0.4222, last eval raw return: 3480.46, last eval normalized score: 107.56
+[Online] Iteration 85/150 - last training loss: 0.4068, last eval raw return: 3332.21, last eval normalized score: 103.01
+[Online] Iteration 86/150 - last training loss: 0.4349, last eval raw return: 2966.98, last eval normalized score: 91.79
+[Online] Iteration 87/150 - last training loss: 0.4387, last eval raw return: 3112.79, last eval normalized score: 96.27
+[Online] Iteration 88/150 - last training loss: 0.4184, last eval raw return: 3232.82, last eval normalized score: 99.95
+[Online] Iteration 89/150 - last training loss: 0.4405, last eval raw return: 3197.28, last eval normalized score: 98.86
+[Online] Iteration 90/150 - last training loss: 0.4271, last eval raw return: 3020.83, last eval normalized score: 93.44
+[Online] Iteration 91/150 - last training loss: 0.4249, last eval raw return: 3303.21, last eval normalized score: 102.12
+[Online] Iteration 92/150 - last training loss: 0.4487, last eval raw return: 3159.25, last eval normalized score: 97.69
+[Online] Iteration 93/150 - last training loss: 0.4286, last eval raw return: 3296.91, last eval normalized score: 101.92
+[Online] Iteration 94/150 - last training loss: 0.4157, last eval raw return: 3307.04, last eval normalized score: 102.24
+[Online] Iteration 95/150 - last training loss: 0.4191, last eval raw return: 3376.05, last eval normalized score: 104.36
+[Online] Iteration 96/150 - last training loss: 0.4403, last eval raw return: 3066.93, last eval normalized score: 94.86
+[Online] Iteration 97/150 - last training loss: 0.4330, last eval raw return: 3152.74, last eval normalized score: 97.49
+[Online] Iteration 98/150 - last training loss: 0.4643, last eval raw return: 3146.78, last eval normalized score: 97.31
+[Online] Iteration 99/150 - last training loss: 0.4273, last eval raw return: 3304.56, last eval normalized score: 102.16
+[Online] Iteration 100/150 - last training loss: 0.4358, last eval raw return: 3315.14, last eval normalized score: 102.48
+[Online] Iteration 101/150 - last training loss: 0.4351, last eval raw return: 3350.17, last eval normalized score: 103.56
+[Online] Iteration 102/150 - last training loss: 0.4233, last eval raw return: 2936.93, last eval normalized score: 90.86
+[Online] Iteration 103/150 - last training loss: 0.4230, last eval raw return: 3455.11, last eval normalized score: 106.78
+[Online] Iteration 104/150 - last training loss: 0.4574, last eval raw return: 3459.01, last eval normalized score: 106.90
+[Online] Iteration 105/150 - last training loss: 0.4394, last eval raw return: 3333.31, last eval normalized score: 103.04
+[Online] Iteration 106/150 - last training loss: 0.4350, last eval raw return: 3475.49, last eval normalized score: 107.41
+[Online] Iteration 107/150 - last training loss: 0.4187, last eval raw return: 3272.23, last eval normalized score: 101.17
+[Online] Iteration 108/150 - last training loss: 0.4189, last eval raw return: 2925.58, last eval normalized score: 90.51
+[Online] Iteration 109/150 - last training loss: 0.4455, last eval raw return: 3177.87, last eval normalized score: 98.27
+[Online] Iteration 110/150 - last training loss: 0.4333, last eval raw return: 3149.41, last eval normalized score: 97.39
+[Online] Iteration 111/150 - last training loss: 0.4272, last eval raw return: 3320.08, last eval normalized score: 102.64
+[Online] Iteration 112/150 - last training loss: 0.4632, last eval raw return: 3116.60, last eval normalized score: 96.38
+[Online] Iteration 113/150 - last training loss: 0.4481, last eval raw return: 3295.76, last eval normalized score: 101.89
+[Online] Iteration 114/150 - last training loss: 0.4291, last eval raw return: 3474.24, last eval normalized score: 107.37
+[Online] Iteration 115/150 - last training loss: 0.4357, last eval raw return: 3293.54, last eval normalized score: 101.82
+[Online] Iteration 116/150 - last training loss: 0.4260, last eval raw return: 3159.18, last eval normalized score: 97.69
+[Online] Iteration 117/150 - last training loss: 0.4647, last eval raw return: 3463.77, last eval normalized score: 107.05
+[Online] Iteration 118/150 - last training loss: 0.4400, last eval raw return: 3305.81, last eval normalized score: 102.20
+[Online] Iteration 119/150 - last training loss: 0.4321, last eval raw return: 3177.33, last eval normalized score: 98.25
+[Online] Iteration 120/150 - last training loss: 0.4434, last eval raw return: 3123.49, last eval normalized score: 96.60
+[Online] Iteration 121/150 - last training loss: 0.4578, last eval raw return: 3280.03, last eval normalized score: 101.41
+[Online] Iteration 122/150 - last training loss: 0.4745, last eval raw return: 2970.66, last eval normalized score: 91.90
+[Online] Iteration 123/150 - last training loss: 0.4376, last eval raw return: 3141.45, last eval normalized score: 97.15
+[Online] Iteration 124/150 - last training loss: 0.4218, last eval raw return: 3469.00, last eval normalized score: 107.21
+[Online] Iteration 125/150 - last training loss: 0.4296, last eval raw return: 3439.79, last eval normalized score: 106.31
+[Online] Iteration 126/150 - last training loss: 0.4557, last eval raw return: 3469.81, last eval normalized score: 107.24
+[Online] Iteration 127/150 - last training loss: 0.3926, last eval raw return: 3461.74, last eval normalized score: 106.99
+[Online] Iteration 128/150 - last training loss: 0.4311, last eval raw return: 3451.88, last eval normalized score: 106.69
+[Online] Iteration 129/150 - last training loss: 0.4276, last eval raw return: 3316.30, last eval normalized score: 102.52
+[Online] Iteration 130/150 - last training loss: 0.4104, last eval raw return: 2955.05, last eval normalized score: 91.42
+[Online] Iteration 131/150 - last training loss: 0.4417, last eval raw return: 3452.68, last eval normalized score: 106.71
+[Online] Iteration 132/150 - last training loss: 0.4443, last eval raw return: 3004.30, last eval normalized score: 92.93
+[Online] Iteration 133/150 - last training loss: 0.4592, last eval raw return: 3491.30, last eval normalized score: 107.90
+[Online] Iteration 134/150 - last training loss: 0.4708, last eval raw return: 3479.72, last eval normalized score: 107.54
+[Online] Iteration 135/150 - last training loss: 0.4392, last eval raw return: 3474.42, last eval normalized score: 107.38
+[Online] Iteration 136/150 - last training loss: 0.4522, last eval raw return: 3206.67, last eval normalized score: 99.15
+[Online] Iteration 137/150 - last training loss: 0.4088, last eval raw return: 2943.88, last eval normalized score: 91.08
+[Online] Iteration 138/150 - last training loss: 0.4061, last eval raw return: 3397.45, last eval normalized score: 105.01
+[Online] Iteration 139/150 - last training loss: 0.4215, last eval raw return: 3323.95, last eval normalized score: 102.75
+[Online] Iteration 140/150 - last training loss: 0.4282, last eval raw return: 3461.47, last eval normalized score: 106.98
+[Online] Iteration 141/150 - last training loss: 0.4273, last eval raw return: 3179.36, last eval normalized score: 98.31
+[Online] Iteration 142/150 - last training loss: 0.4100, last eval raw return: 3448.81, last eval normalized score: 106.59
+[Online] Iteration 143/150 - last training loss: 0.4436, last eval raw return: 2968.15, last eval normalized score: 91.82
+[Online] Iteration 144/150 - last training loss: 0.4371, last eval raw return: 3132.06, last eval normalized score: 96.86
+[Online] Iteration 145/150 - last training loss: 0.4395, last eval raw return: 3153.59, last eval normalized score: 97.52
+[Online] Iteration 146/150 - last training loss: 0.4550, last eval raw return: 3364.84, last eval normalized score: 104.01
+[Online] Iteration 147/150 - last training loss: 0.4238, last eval raw return: 3463.76, last eval normalized score: 107.05
+[Online] Iteration 148/150 - last training loss: 0.4001, last eval raw return: 3001.68, last eval normalized score: 92.85
+[Online] Iteration 149/150 - last training loss: 0.4578, last eval raw return: 3295.28, last eval normalized score: 101.87
+[Online] Iteration 150/150 - last training loss: 0.4589, last eval raw return: 3448.40, last eval normalized score: 106.58
+Evaluation scores over iterations: [90.61156121215467, 97.91140066827774, 103.13103471176417, 101.67515797507383, 98.91866472301788, 94.08505473431916, 99.0552996832744, 94.46159274536585, 95.95548070416505, 87.4189983505917, 98.46022693971146, 103.28410442441181, 97.9794400893669, 94.16902052618006, 94.10549084813377, 98.65179708625953, 100.55738197534325, 90.71842715950531, 90.57226498828356, 101.94319313451408, 90.20515897352577, 99.59805851370174, 88.28858383352907, 98.05188706446282, 93.1839661869074, 94.19198773261913, 94.0695998073665, 98.17866249174017, 80.98193468649853, 102.30151876229068, 100.6314950811522, 83.77907123000986, 96.23408127101823, 105.07243797417871, 107.75137797650225, 96.619220796116, 105.32117201985139, 102.37643375599039, 98.25441857792254, 98.13118034391513, 99.47145961468196, 97.56388591486834, 92.77323303807898, 103.28785795958126, 94.50647393176541, 98.307623969154, 93.29442883218954, 96.09448327446538, 98.7789240654022, 96.57003270616825, 107.23888990928083, 91.1900551420864, 97.97642106684795, 103.29480873856627, 97.32664854368413, 98.78379961555764, 98.14050954608001, 102.25008387347607, 97.38258133483232, 107.77741111132437, 86.19500989636647, 107.51930416826126, 80.44267025830047, 103.67123895432108, 99.02172875086994, 107.57919869439706, 101.28185652894301, 107.5826424031221, 83.30463984588789, 90.5073125268685, 98.1852155971911, 84.87969141099104, 98.60508277523161, 94.18583468691696, 108.45960556298179, 97.46147337584502, 102.51618829713978, 103.54716218470334, 92.37421482283094, 99.7562682475199, 106.97955373210723, 103.18323386379996, 98.84113486229948, 103.43225944852298, 107.56350501109875, 103.00842075360572, 91.78637808334967, 96.26649650929458, 99.9544203210489, 98.86244304929089, 93.44087987095764, 102.11733106884606, 97.69415849721445, 101.92381296746092, 102.23504792326874, 104.35532386325974, 94.85740812728082, 97.49407606386488, 97.31097968566934, 102.15872528399521, 102.48378922546033, 103.56020229285522, 90.86301639614723, 106.7845330066463, 106.9043298096455, 103.04233075324947, 107.41079673526983, 101.16528940404663, 90.51416912531012, 98.26612449644063, 97.3916784557384, 102.63576731102275, 96.38366557512212, 101.88830279964156, 107.3723032223058, 101.82035175664532, 97.69171721169484, 107.05083344694799, 102.19736846734517, 98.24944633968012, 96.59509961451195, 101.40512875061123, 91.89930242173546, 97.14702439000345, 107.21134578006526, 106.31373834530949, 107.23630608302068, 106.98832067481958, 106.6855044446114, 102.51966458510329, 91.41990399191245, 106.70995376725291, 92.93317019869892, 107.89646124485532, 107.54068579036202, 107.37790121066332, 99.15089686115532, 91.07640592805055, 105.01286405950532, 102.75444732780447, 106.98013451654414, 98.31177283271212, 106.59093313044137, 91.82238793801183, 96.85860827579175, 97.51997108617701, 104.01090093992735, 107.05044577637433, 92.85262198432505, 101.87370552264252, 106.5783479830747]
+Raw returns over iterations: [2928.746471338908, 3166.3250245873523, 3336.2017885890136, 3288.8192275217516, 3199.107161551145, 3041.7938295272425, 3203.5540451266015, 3054.0485313525664, 3102.668195127375, 2824.8422046267647, 3184.1869724199983, 3341.1835530641865, 3168.539416742603, 3044.526556934822, 3042.4589376276713, 3190.4217613542, 3252.440399402584, 2932.2245008648583, 2927.4675473198886, 3297.5426255885563, 2915.519816633592, 3221.2185237046315, 2853.143492922745, 3170.8972559298845, 3012.467251219653, 3045.2740412748194, 3041.290837754884, 3175.023253875599, 2615.34331335997, 3309.204592231891, 3254.852464018617, 2706.378144638124, 3111.7354520177514, 3399.3861614959233, 3486.574200879112, 3124.2700963371917, 3407.4813908594924, 3311.6427548691345, 3177.488790475842, 3173.477913042666, 3217.098270998699, 3155.014905667101, 2999.0996439104288, 3341.3057145802704, 3055.509222015282, 3179.2203984036278, 3016.0623378803757, 3107.1921342836076, 3194.55920080956, 3122.6692343843943, 3469.8949061768935, 2947.5739745685723, 3168.4411604718193, 3341.531932708098, 3147.29384388743, 3194.7178791146357, 3173.7815386726015, 3307.530606585424, 3149.114217017552, 3487.421468075156, 2785.0066153791527, 3479.0211909889413, 2597.792562629119, 3353.7831262577056, 3202.4614548580357, 3480.970501648769, 3276.018947580814, 3481.0825796391982, 2690.937432204262, 2925.353622499258, 3175.236529430722, 2742.1986242315784, 3188.901410325014, 3045.073785953483, 3509.623979765045, 3151.6818155352007, 3316.1911674603625, 3349.7449580767884, 2986.1133075850607, 3226.3675738852917, 3461.4546227777564, 3337.9006477346147, 3196.583896176099, 3346.005365447375, 3480.459739378507, 3332.2112286647243, 2966.9817358632886, 3112.7904293852935, 3232.8165763921497, 3197.277386528619, 3020.8286928285074, 3303.210070571825, 3159.2547210531457, 3296.911884038982, 3307.0412507141823, 3376.047164246708, 3066.9306291513008, 3152.7428935901808, 3146.7838895739706, 3304.557275233941, 3315.136716246406, 3350.1693578252416, 2936.930262116617, 3455.1075322578945, 3459.006405830582, 3333.314854121755, 3475.489738125936, 3272.2251862172016, 2925.576775453204, 3177.8697680579776, 3149.4102893951135, 3320.08295292879, 3116.6037813517437, 3295.7561799516743, 3474.236938913787, 3293.5446641253598, 3159.1752676507385, 3463.774472636046, 3305.814945577019, 3177.3269653870657, 3123.485055041068, 3280.0309311669857, 2970.656940105997, 3141.4478459286474, 3468.9984625757907, 3439.785179596608, 3469.810813683022, 3461.7399492672675, 3451.884576103867, 3316.304305765665, 2955.054571578372, 3452.680296987318, 3004.304914445369, 3491.2960407501196, 3479.717071340193, 3474.4191294925085, 3206.6653244022755, 2943.8751787237115, 3397.447285367959, 3323.945479886537, 3461.473524827191, 3179.355426167963, 3448.8066843044144, 2968.1537026201936, 3132.0611349523565, 3153.585665814725, 3364.8376711718606, 3463.761855616921, 3001.683414568185, 3295.281101017179, 3448.3970915836753]
+Saved raw return evaluation plot to sbatch_scripts/logs/reinforce_online/buffered/rollouts_5_updates_1/plots/hopper-medium-v2_eval_raw_return_25-12-09-23-32-17.png
+Saved normalized evaluation plot to sbatch_scripts/logs/reinforce_online/buffered/rollouts_5_updates_1/plots/hopper-medium-v2_eval_25-12-09-23-32-17.png
+Saved training loss plot to sbatch_scripts/logs/reinforce_online/buffered/rollouts_5_updates_1/plots/hopper-medium-v2_training_losses_25-12-09-23-32-17.png
+Saved training stats plot to sbatch_scripts/logs/reinforce_online/buffered/rollouts_5_updates_1/plots/hopper-medium-v2_training_stats_25-12-09-23-32-17.png
+============================================================
+finished training!
+Saved model checkpoint to models/reinforce_online/buffered/rollouts_5_updates_1/hopper-medium_reinforce.pt
+finished training at: 25-12-10-00-31-19
+============================================================
+Model checkpoint path: models/reinforce_online/buffered/rollouts_5_updates_1/hopper-medium_reinforce.pt
+All plots for this run saved under: sbatch_scripts/logs/reinforce_online/buffered/rollouts_5_updates_1/plots
+Saved per-iteration training loss plot to sbatch_scripts/logs/reinforce_online/buffered/rollouts_5_updates_1/plots/hopper-medium-v2_training_losses_25-12-09-23-32-17.png
+Saved per-iteration training stats plot to sbatch_scripts/logs/reinforce_online/buffered/rollouts_5_updates_1/plots/hopper-medium-v2_training_stats_25-12-09-23-32-17.png
+Saved per-update training loss plot to sbatch_scripts/logs/reinforce_online/buffered/rollouts_5_updates_1/plots/hopper-medium-v2_training_losses_steps_25-12-09-23-32-17.png
+Saved per-update training stats plot to sbatch_scripts/logs/reinforce_online/buffered/rollouts_5_updates_1/plots/hopper-medium-v2_training_stats_steps_25-12-09-23-32-17.png

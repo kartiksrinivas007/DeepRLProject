@@ -194,6 +194,7 @@ class ReinFormerTrainer:
             loss.detach().cpu().item(),
             {
                 "returns_to_go_loss": returns_to_go_loss.detach().cpu().item(),
+                "returns_to_go_norm": norm.detach().cpu().item(),
                 "action_loss": action_loss.detach().cpu().item(),
                 "temperature_loss": temperature_loss.detach().cpu().item(),
                 "entropy": entropy.detach().cpu().item(),
@@ -206,5 +207,106 @@ class ReinFormerTrainer:
                 "adv_min": adv_min,
                 "weights_mean": weights_mean,
                 "weights_max": weights_max,
+            },
+        )
+
+    def reinforce_step(
+        self,
+        timesteps,
+        states,
+        actions,
+        returns_to_go,
+        traj_mask,
+        use_baseline: bool = False,
+        tau: float = 0.99,
+        critic_coef: float = 1.0,
+    ):
+        """Policy-gradient (REINFORCE-style) update using returns-to-go as weights."""
+        self.model.train()
+
+        timesteps = timesteps.to(self.device)
+        states = states.to(self.device)
+        actions = actions.to(self.device)
+        returns_to_go = returns_to_go.to(self.device).unsqueeze(-1)  # B x T x 1
+        traj_mask = traj_mask.to(self.device)
+
+        # Forward pass (one call) to get RTG predictions and action distributions.
+        returns_to_go_preds, actions_dist_preds, _ = self.model.forward(
+            timesteps=timesteps,
+            states=states,
+            actions=actions,
+            returns_to_go=returns_to_go,
+        )
+
+        # Log-probabilities of taken actions.
+        log_prob_all = actions_dist_preds.log_prob(actions).sum(axis=2)  # B x T
+
+        # Mask and flatten.
+        mask_flat = traj_mask.view(-1) > 0
+        log_prob_flat = log_prob_all.view(-1)[mask_flat]
+        rtg_flat = returns_to_go.view(-1)[mask_flat]
+        rtg_pred_flat = returns_to_go_preds.view(-1)[mask_flat]
+
+        # Baseline (advantage) for REINFORCE.
+        if use_baseline:
+            norm_adv = rtg_flat.abs().mean() + 1e-8
+            adv_flat = (rtg_flat - rtg_pred_flat.detach()) / norm_adv
+        else:
+            adv_flat = rtg_flat
+
+        # REINFORCE loss: - E[adv * log pi(a|s)]
+        reinforce_policy_loss = -(adv_flat * log_prob_flat).mean()
+
+        entropy = actions_dist_preds.entropy().sum(axis=2).mean()
+
+        # Critic/RTG regression with expectile (if baseline used).
+        critic_loss = torch.tensor(0.0, device=self.device)
+        if use_baseline:
+            norm = rtg_flat.abs().mean() + 1e-8
+            u = (rtg_flat - rtg_pred_flat) / norm
+            critic_loss = torch.mean(
+                torch.abs(tau - (u < 0).float()) * u ** 2
+            )
+        else:
+            norm = rtg_flat.abs().mean() + 1e-8
+
+        reinforce_loss = reinforce_policy_loss + critic_coef * critic_loss
+
+        # Optimize policy parameters.
+        self.optimizer.zero_grad()
+        reinforce_loss.backward()
+        torch.nn.utils.clip_grad_norm_(self.model.parameters(), self.grad_norm)
+        self.optimizer.step()
+
+        # Temperature update (entropy regularization) using the same rule as train_step.
+        self.log_temperature_optimizer.zero_grad()
+        temperature_loss = (
+            self.model.temperature() * (entropy - self.model.target_entropy).detach()
+        )
+        temperature_loss.backward()
+        self.log_temperature_optimizer.step()
+
+        self.scheduler.step()
+
+        # Diagnostics
+        return (
+            reinforce_loss.detach().cpu().item(),
+            {
+                "returns_to_go_loss": critic_loss.detach().cpu().item() if use_baseline else 0.0,
+                "returns_to_go_norm": norm.detach().cpu().item(),
+                "action_loss": 0.0,
+                "temperature_loss": temperature_loss.detach().cpu().item(),
+                "entropy": entropy.detach().cpu().item(),
+                "temperature": self.model.temperature().detach().cpu().item(),
+                "grad_norm": 0.0,
+                "rl_loss": reinforce_loss.detach().cpu().item(),
+                "policy_loss": reinforce_policy_loss.detach().cpu().item(),
+                "critic_loss": critic_loss.detach().cpu().item() if use_baseline else 0.0,
+                "adv_mean": None,
+                "adv_std": None,
+                "adv_max": None,
+                "adv_min": None,
+                "weights_mean": None,
+                "weights_max": None,
             },
         )

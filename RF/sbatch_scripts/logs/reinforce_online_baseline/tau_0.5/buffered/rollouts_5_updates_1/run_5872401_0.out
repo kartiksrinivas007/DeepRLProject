@@ -9,3 +9,15 @@ returns min : 1350.3359375
 Using Minari eval environment: Hopper-v5
 Loaded pretrained model from sbatch_scripts/logs/tau_lr/K_20/enc_6/tau_0.99/lr_4e-4/model.pt
 Running initial evaluation before training...
+[Online] Iteration 1/10 - last training loss: 16.2251, last eval raw return: 3164.07, last eval normalized score: 97.84
+[Online] Iteration 2/10 - last training loss: 19.2407, last eval raw return: 3348.71, last eval normalized score: 103.52
+[Online] Iteration 3/10 - last training loss: 23.8189, last eval raw return: 3286.19, last eval normalized score: 101.59
+[Online] Iteration 4/10 - last training loss: 24.2508, last eval raw return: 3200.50, last eval normalized score: 98.96
+[Online] Iteration 5/10 - last training loss: 21.5042, last eval raw return: 3048.69, last eval normalized score: 94.30
+[Online] Iteration 6/10 - last training loss: 20.1194, last eval raw return: 3206.91, last eval normalized score: 99.16
+[Online] Iteration 7/10 - last training loss: 17.6245, last eval raw return: 3053.45, last eval normalized score: 94.44
+[Online] Iteration 8/10 - last training loss: 27.4758, last eval raw return: 3106.99, last eval normalized score: 96.09
+[Online] Iteration 9/10 - last training loss: 35.2892, last eval raw return: 2824.14, last eval normalized score: 87.40
+[Online] Iteration 10/10 - last training loss: 28.9994, last eval raw return: 3179.95, last eval normalized score: 98.33
+Evaluation scores over iterations: [90.61156121215467, 97.84206220226864, 103.51544149977757, 101.59428908504935, 98.96156409346159, 94.29688549490612, 99.15829456759222, 94.44306808519156, 96.0883754173691, 87.39752085390202, 98.33017230325389]
+Raw returns over iterations: [2928.746471338908, 3164.0683540759082, 3348.7125854502374, 3286.187291023654, 3200.5033525806257, 3048.6880147947772, 3206.906088107176, 3053.4456328929386, 3106.9933496581225, 2824.1432039676947, 3179.9542502404815]

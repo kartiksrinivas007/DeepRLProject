@@ -158,7 +158,7 @@ def experiment(variant):
         return r
 
     def compute_returns_to_go_from_rewards(rewards_np):
-        return discount_cumsum_np(rewards_np, gamma=1.0) / reward_scale
+        return discount_cumsum_np(rewards_np, gamma=variant.get("rtg_gamma", 1.0)) / reward_scale
 
     def collect_online_trajectory(model, env_for_rollout, use_mean_action=False):
         eval_batch_size = 1
@@ -497,6 +497,17 @@ def experiment(variant):
             device=device,
             variant=variant
         )
+
+        # If a pretrained checkpoint is provided, load it before any evaluation
+        # or training so that the initial eval reflects the checkpoint.
+        if variant.get("pretrained_model"):
+            try:
+                state_dict = torch.load(variant["pretrained_model"], map_location=device)
+                Trainer.model.load_state_dict(state_dict)
+                print(f"Loaded pretrained model from {variant['pretrained_model']}")
+            except Exception as e:
+                print(f"Warning: could not load pretrained model: {e}")
+
         if eval_env is not None:
             def evaluator(model):
                 return_mean, _, _, _ = Reinformer_eval(
@@ -572,7 +583,6 @@ def experiment(variant):
     raw_return_list = []
 
     # Global gradient-update counter (for throttled logging).
-    global_update_step = 0
 
     # Per-iteration training diagnostics for plotting.
     training_loss_list = []
@@ -583,9 +593,10 @@ def experiment(variant):
     temperature_list = []
     grad_norm_list = []
     rl_loss_list = []
+    policy_loss_list = []
+    critic_loss_list = []
 
     # Global gradient-update counter (for throttled logging).
-    global_update_step = 0
 
     # Per-iteration training diagnostics for plotting.
     training_loss_list = []
@@ -612,11 +623,16 @@ def experiment(variant):
     step_action_loss_list = []
     step_temperature_loss_list = []
     step_rl_loss_list = []
+    step_policy_loss_list = []
+    step_critic_loss_list = []
     step_entropy_list = []
     step_temperature_value_list = []
     step_grad_norm_list = []
 
-    # Optional initial evaluation before any training updates.
+    online_training = variant.get("online_training", False)
+    reinforce_online = variant.get("reinforce_online", False)
+
+    # Always run an initial evaluation (if possible) before any training updates.
     if evaluator is not None:
         print("Running initial evaluation before training...")
         init_raw_return, init_score = evaluator(model=Trainer.model)
@@ -632,51 +648,43 @@ def experiment(variant):
                 }
             )
 
-    # Progress bar over training iterations to indicate offline training progress.
-    for itr in tqdm(range(1, max_train_iters + 1), desc="Training iterations"):
-        t1 = time.time()
-            # accumulate per-iteration diagnostics
+    if not online_training:
+
+        # Offline training loop with diagnostics.
+        for itr in tqdm(range(1, max_train_iters + 1), desc="Training iterations"):
+            t1 = time.time()
             total_loss_sum = 0.0
             rtg_loss_sum = 0.0
             action_loss_sum = 0.0
             temperature_loss_sum = 0.0
+            rl_loss_sum = 0.0
+            policy_loss_sum = 0.0
+            critic_loss_sum = 0.0
             entropy_sum = 0.0
             temperature_sum = 0.0
             grad_norm_sum = 0.0
-            rl_loss_sum = 0.0
             num_updates = 0
 
-        # accumulate per-iteration training diagnostics
-        total_loss_sum = 0.0
-        rtg_loss_sum = 0.0
-        action_loss_sum = 0.0
-        temperature_loss_sum = 0.0
-        rl_loss_sum = 0.0
-        entropy_sum = 0.0
-        temperature_sum = 0.0
-        grad_norm_sum = 0.0
-        num_updates = 0
-
-        for epoch in range(num_updates_per_iter):
-            try:
-                (
-                    timesteps,
-                    states,
-                    actions,
-                    returns_to_go,
-                    rewards,
-                    traj_mask,
-                ) = next(data_iter)
-            except StopIteration:
-                data_iter = iter(traj_data_loader)
-                (
-                    timesteps,
-                    states,
-                    actions,
-                    returns_to_go,
-                    rewards,
-                    traj_mask,
-                ) = next(data_iter)
+            for _ in range(num_updates_per_iter):
+                try:
+                    (
+                        timesteps,
+                        states,
+                        actions,
+                        returns_to_go,
+                        rewards,
+                        traj_mask,
+                    ) = next(data_iter)
+                except StopIteration:
+                    data_iter = iter(traj_data_loader)
+                    (
+                        timesteps,
+                        states,
+                        actions,
+                        returns_to_go,
+                        rewards,
+                        traj_mask,
+                    ) = next(data_iter)
 
                 loss, diag = Trainer.train_step(
                     timesteps=timesteps,
@@ -684,72 +692,64 @@ def experiment(variant):
                     actions=actions,
                     returns_to_go=returns_to_go,
                     rewards=rewards,
-                    traj_mask=traj_mask
+                    traj_mask=traj_mask,
                 )
-                global_update_step += 1
-                # Simple stdout diagnostics every 200 steps (no wandb needed).
-                if global_update_step % 200 == 0:
-                    print(
-                        f"[Offline step {global_update_step}] "
-                        f"loss={loss:.4f}, rtg_loss={diag['returns_to_go_loss']:.4f}, "
-                        f"action_loss={diag['action_loss']:.4f}, "
-                        f"temp_loss={diag['temperature_loss']:.4f}, "
-                        f"entropy={diag['entropy']:.4f}, "
-                        f"temp={diag['temperature']:.4f}, "
-                        f"grad_norm={diag['grad_norm']:.4f}, "
-                        f"adv_mean={diag['adv_mean']}, "
-                        f"adv_std={diag['adv_std']}, "
-                        f"weights_mean={diag['weights_mean']}, "
-                        f"weights_max={diag['weights_max']}"
-                    )
-                if args.use_wandb:
-                    # Always log total loss; detailed stats every 200 steps.
-                    log_data = {"training/loss": loss}
-                    if global_update_step % 200 == 0:
-                        log_data.update(
-                            {
-                                "training/returns_to_go_loss": diag["returns_to_go_loss"],
-                                "training/action_loss": diag["action_loss"],
-                                "training/temperature_loss": diag["temperature_loss"],
-                                "training/entropy": diag["entropy"],
-                                "training/temperature": diag["temperature"],
-                                "training/grad_norm": diag["grad_norm"],
-                            }
-                        )
-                        if diag.get("adv_mean") is not None:
-                            log_data["training/adv_mean"] = diag["adv_mean"]
-                            log_data["training/adv_std"] = diag["adv_std"]
-                            log_data["training/adv_max"] = diag["adv_max"]
-                            log_data["training/adv_min"] = diag["adv_min"]
-                        if diag.get("weights_mean") is not None:
-                            log_data["training/weights_mean"] = diag["weights_mean"]
-                            log_data["training/weights_max"] = diag["weights_max"]
 
-                    wandb.log(data=log_data)
-
-                # accumulate per-iteration sums
+                # Accumulate diagnostics for this iteration.
                 total_loss_sum += loss
                 rtg_loss_sum += diag["returns_to_go_loss"]
                 action_loss_sum += diag["action_loss"]
                 temperature_loss_sum += diag["temperature_loss"]
+                rl_loss_sum += diag["rl_loss"]
+                policy_loss_sum += diag.get("policy_loss", diag["rl_loss"])
+                critic_loss_sum += diag.get("critic_loss", diag["returns_to_go_loss"])
                 entropy_sum += diag["entropy"]
                 temperature_sum += diag["temperature"]
                 grad_norm_sum += diag["grad_norm"]
-                rl_loss_sum += diag["rl_loss"]
                 num_updates += 1
 
-            t2 = time.time()
+                # Fine-grained per-update diagnostics.
+                step_loss_list.append(loss)
+                step_rtg_loss_list.append(diag["returns_to_go_loss"])
+                step_action_loss_list.append(diag["action_loss"])
+                step_temperature_loss_list.append(diag["temperature_loss"])
+                step_rl_loss_list.append(diag["rl_loss"])
+                step_policy_loss_list.append(diag.get("policy_loss", diag["rl_loss"]))
+                step_critic_loss_list.append(diag.get("critic_loss", diag["returns_to_go_loss"]))
+                step_entropy_list.append(diag["entropy"])
+                step_temperature_value_list.append(diag["temperature"])
+                step_grad_norm_list.append(diag["grad_norm"])
 
-            # Per-iteration averages for plotting.
+                if args.use_wandb:
+                    wandb.log(
+                        data={
+                            "training/loss": loss,
+                            "training/returns_to_go_loss": diag["returns_to_go_loss"],
+                            "training/action_loss": diag["action_loss"],
+                            "training/temperature_loss": diag["temperature_loss"],
+                            "training/rl_loss": diag["rl_loss"],
+                            "training/policy_loss": diag.get("policy_loss", diag["rl_loss"]),
+                            "training/critic_loss": diag.get("critic_loss", diag["returns_to_go_loss"]),
+                            "training/entropy": diag["entropy"],
+                            "training/temperature": diag["temperature"],
+                            "training/grad_norm": diag["grad_norm"],
+                        }
+                    )
+
+            # Per-iteration averages (used for coarse plots).
             if num_updates > 0:
                 training_loss_list.append(total_loss_sum / num_updates)
                 rtg_loss_list.append(rtg_loss_sum / num_updates)
                 action_loss_list.append(action_loss_sum / num_updates)
                 temperature_loss_list.append(temperature_loss_sum / num_updates)
+                rl_loss_list.append(rl_loss_sum / num_updates)
+                policy_loss_list.append(policy_loss_sum / num_updates)
+                critic_loss_list.append(critic_loss_sum / num_updates)
                 entropy_list.append(entropy_sum / num_updates)
                 temperature_list.append(temperature_sum / num_updates)
                 grad_norm_list.append(grad_norm_sum / num_updates)
-                rl_loss_list.append(rl_loss_sum / num_updates)
+
+            t2 = time.time()
             if evaluator is not None:
                 raw_return, normalized_d4rl_score = evaluator(model=Trainer.model)
                 t3 = time.time()
@@ -778,30 +778,34 @@ def experiment(variant):
                 )
             )
     else:
-        # Online finetuning loop with advantage-weighted RL term.
-        online_buffer_size = variant.get("online_buffer_size", len(traj_dataset))
+        # Online finetuning loop with advantage-weighted RL term or REINFORCE.
+        online_buffer_size = variant.get("online_buffer_size")
+        if online_buffer_size is None:
+            online_buffer_size = len(traj_dataset)
         beta_rl = variant.get("beta_rl", 0.0)
         adv_scale = variant.get("adv_scale", 1.0)
+        num_online_rollouts_per_iter = int(variant.get("num_online_rollouts_per_iter", 1))
+        use_baseline = bool(variant.get("baseline", False))
+        expectile_tau = float(variant.get("tau", 0.99))
+        critic_coef = float(variant.get("critic_coef", 1.0))
+        no_buffer = variant.get("no_buffer", False)
 
-        # Initialize buffer with top offline trajectories by return.
-        offline_returns = [
-            float(np.sum(traj["rewards"])) for traj in traj_dataset.trajectories
-        ]
-        sorted_indices = np.argsort(offline_returns)[::-1]
-        online_replay_buffer = [
-            traj_dataset.trajectories[i] for i in sorted_indices[:online_buffer_size]
-        ]
-
-        # Optionally load a pretrained model checkpoint.
-        if variant.get("pretrained_model"):
-            try:
-                state_dict = torch.load(
-                    variant["pretrained_model"], map_location=device
-                )
-                Trainer.model.load_state_dict(state_dict)
-                print(f"Loaded pretrained model from {variant['pretrained_model']}")
-            except Exception as e:
-                print(f"Warning: could not load pretrained model: {e}")
+        # Initialize buffer. If reinforce_online && no_buffer, skip seeding and
+        # avoid reusing past rollouts. If reinforce_online but buffer reuse is
+        # allowed, start empty. Otherwise seed with top offline.
+        if reinforce_online and no_buffer:
+            online_replay_buffer = []
+        elif reinforce_online:
+            online_replay_buffer = []
+        else:
+            offline_returns = [
+                float(np.sum(traj["rewards"])) for traj in traj_dataset.trajectories
+            ]
+            sorted_indices = np.argsort(offline_returns)[::-1]
+            online_replay_buffer = [
+                traj_dataset.trajectories[i]
+                for i in sorted_indices[:online_buffer_size]
+            ]
 
         try:
             rollout_env = gym.make(d4rl_env)
@@ -811,15 +815,18 @@ def experiment(variant):
 
         for itr in tqdm(range(1, max_train_iters + 1), desc="Online iterations"):
             # 1) Collect rollouts with stochastic policy (rsample).
+            new_rollouts = []
             for _ in range(num_online_rollouts_per_iter):
                 new_traj = collect_online_trajectory(
                     model=Trainer.model,
                     env_for_rollout=rollout_env,
                     use_mean_action=False,
                 )
-                online_replay_buffer.append(new_traj)
-                if len(online_replay_buffer) > online_buffer_size:
-                    online_replay_buffer.pop(0)
+                new_rollouts.append(new_traj)
+                if not (reinforce_online and no_buffer):
+                    online_replay_buffer.append(new_traj)
+                    if len(online_replay_buffer) > online_buffer_size:
+                        online_replay_buffer.pop(0)
 
             # 2) Train for num_updates_per_iter minibatches from buffer.
             t1 = time.time()
@@ -831,81 +838,97 @@ def experiment(variant):
             temperature_sum = 0.0
             grad_norm_sum = 0.0
             rl_loss_sum = 0.0
+            policy_loss_sum = 0.0
+            critic_loss_sum = 0.0
             num_updates = 0
 
             for _ in range(num_updates_per_iter):
-                (
-                    timesteps,
-                    states,
-                    actions,
-                    returns_to_go,
-                    rewards,
-                    traj_mask,
-                ) = sample_online_batch(
-                    online_replay_buffer,
-                    batch_size=variant["batch_size"],
-                    context_len=variant["context_len"],
-                )
-
-                loss, diag = Trainer.train_step(
-                    timesteps=timesteps,
-                    states=states,
-                    actions=actions,
-                    returns_to_go=returns_to_go,
-                    rewards=rewards,
-                    traj_mask=traj_mask,
-                    beta_rl=beta_rl,
-                    adv_scale=adv_scale,
-                )
-                global_update_step += 1
-                if global_update_step % 200 == 0:
-                    print(
-                        f"[Online step {global_update_step}] "
-                        f"loss={loss:.4f}, rtg_loss={diag['returns_to_go_loss']:.4f}, "
-                        f"action_loss={diag['action_loss']:.4f}, "
-                        f"temp_loss={diag['temperature_loss']:.4f}, "
-                        f"entropy={diag['entropy']:.4f}, "
-                        f"temp={diag['temperature']:.4f}, "
-                        f"grad_norm={diag['grad_norm']:.4f}, "
-                        f"adv_mean={diag['adv_mean']}, "
-                        f"adv_std={diag['adv_std']}, "
-                        f"weights_mean={diag['weights_mean']}, "
-                        f"weights_max={diag['weights_max']}"
+                if reinforce_online and no_buffer:
+                    # Train only on freshly collected rollouts; batch size equals rollouts collected.
+                    (
+                        timesteps,
+                        states,
+                        actions,
+                        returns_to_go,
+                        rewards,
+                        traj_mask,
+                    ) = sample_online_batch(
+                        new_rollouts,
+                        batch_size=len(new_rollouts),
+                        context_len=variant["context_len"],
                     )
-
+                    loss, diag = Trainer.reinforce_step(
+                        timesteps=timesteps,
+                        states=states,
+                        actions=actions,
+                        returns_to_go=returns_to_go,
+                        traj_mask=traj_mask,
+                        use_baseline=use_baseline,
+                        tau=expectile_tau,
+                        critic_coef=critic_coef,
+                    )
+                else:
+                    (
+                        timesteps,
+                        states,
+                        actions,
+                        returns_to_go,
+                        rewards,
+                        traj_mask,
+                    ) = sample_online_batch(
+                        online_replay_buffer,
+                        batch_size=variant["batch_size"],
+                        context_len=variant["context_len"],
+                    )
+                    if reinforce_online:
+                        loss, diag = Trainer.reinforce_step(
+                            timesteps=timesteps,
+                            states=states,
+                            actions=actions,
+                            returns_to_go=returns_to_go,
+                            traj_mask=traj_mask,
+                            use_baseline=use_baseline,
+                            tau=expectile_tau,
+                            critic_coef=critic_coef,
+                        )
+                    else:
+                        loss, diag = Trainer.train_step(
+                            timesteps=timesteps,
+                            states=states,
+                            actions=actions,
+                            returns_to_go=returns_to_go,
+                            rewards=rewards,
+                            traj_mask=traj_mask,
+                            beta_rl=beta_rl,
+                            adv_scale=adv_scale,
+                        )
                 # Fine-grained per-update diagnostics for online phase as well.
                 step_loss_list.append(loss)
                 step_rtg_loss_list.append(diag["returns_to_go_loss"])
                 step_action_loss_list.append(diag["action_loss"])
                 step_temperature_loss_list.append(diag["temperature_loss"])
                 step_rl_loss_list.append(diag["rl_loss"])
+                step_policy_loss_list.append(diag.get("policy_loss", diag["rl_loss"]))
+                step_critic_loss_list.append(diag.get("critic_loss", diag["returns_to_go_loss"]))
                 step_entropy_list.append(diag["entropy"])
                 step_temperature_value_list.append(diag["temperature"])
                 step_grad_norm_list.append(diag["grad_norm"])
 
                 if args.use_wandb:
-                    log_data = {"training/loss": loss}
-                    if global_update_step % 200 == 0:
-                        log_data.update(
-                            {
-                                "training/returns_to_go_loss": diag["returns_to_go_loss"],
-                                "training/action_loss": diag["action_loss"],
-                                "training/temperature_loss": diag["temperature_loss"],
-                                "training/entropy": diag["entropy"],
-                                "training/temperature": diag["temperature"],
-                                "training/grad_norm": diag["grad_norm"],
-                            }
-                        )
-                        if diag.get("adv_mean") is not None:
-                            log_data["training/adv_mean"] = diag["adv_mean"]
-                            log_data["training/adv_std"] = diag["adv_std"]
-                            log_data["training/adv_max"] = diag["adv_max"]
-                            log_data["training/adv_min"] = diag["adv_min"]
-                        if diag.get("weights_mean") is not None:
-                            log_data["training/weights_mean"] = diag["weights_mean"]
-                            log_data["training/weights_max"] = diag["weights_max"]
-
-                    wandb.log(data=log_data)
+                    wandb.log(
+                        data={
+                            "training/loss": loss,
+                            "training/returns_to_go_loss": diag["returns_to_go_loss"],
+                            "training/action_loss": diag["action_loss"],
+                            "training/temperature_loss": diag["temperature_loss"],
+                            "training/rl_loss": diag["rl_loss"],
+                            "training/policy_loss": diag.get("policy_loss", diag["rl_loss"]),
+                            "training/critic_loss": diag.get("critic_loss", diag["returns_to_go_loss"]),
+                            "training/entropy": diag["entropy"],
+                            "training/temperature": diag["temperature"],
+                            "training/grad_norm": diag["grad_norm"],
+                        }
+                    )
 
                 # accumulate per-iteration sums (online)
                 total_loss_sum += loss
@@ -916,6 +939,8 @@ def experiment(variant):
                 temperature_sum += diag["temperature"]
                 grad_norm_sum += diag["grad_norm"]
                 rl_loss_sum += diag["rl_loss"]
+                policy_loss_sum += diag.get("policy_loss", diag["rl_loss"])
+                critic_loss_sum += diag.get("critic_loss", diag["returns_to_go_loss"])
                 num_updates += 1
 
             t2 = time.time()
@@ -930,6 +955,8 @@ def experiment(variant):
                 temperature_list.append(temperature_sum / num_updates)
                 grad_norm_list.append(grad_norm_sum / num_updates)
                 rl_loss_list.append(rl_loss_sum / num_updates)
+                policy_loss_list.append(policy_loss_sum / num_updates)
+                critic_loss_list.append(critic_loss_sum / num_updates)
 
             # 3) Evaluate with deterministic actions.
             if evaluator is not None:
@@ -982,7 +1009,17 @@ def experiment(variant):
                 plot_run_dir, f"{d4rl_env}_eval_{start_time_str}.png"
             )
             plt.figure()
-            plt.plot(normalized_d4rl_score_list, marker="o")
+            plt.plot(normalized_d4rl_score_list, marker="o", label="raw")
+            # Smoothed (moving-average) trajectory for readability.
+            if len(normalized_d4rl_score_list) > 2:
+                smooth_window = max(1, len(normalized_d4rl_score_list) // 10)
+                weights = np.ones(smooth_window) / smooth_window
+                smoothed_scores = np.convolve(
+                    normalized_d4rl_score_list, weights, mode="valid"
+                )
+                x_smoothed = np.arange(smooth_window, smooth_window + len(smoothed_scores))
+                plt.plot(x_smoothed, smoothed_scores, label=f"smoothed (w={smooth_window})")
+            plt.legend()
             plt.xlabel("Training iteration")
             plt.ylabel("Normalized score")
             plt.title(f"Online evaluation - {eval_env_id or d4rl_env}")
@@ -1022,6 +1059,10 @@ def experiment(variant):
                 plt.plot(iter_steps, action_loss_list, label="action_loss")
                 plt.plot(iter_steps, temperature_loss_list, label="temperature_loss")
                 plt.plot(iter_steps, rl_loss_list, label="rl_loss")
+                if policy_loss_list:
+                    plt.plot(iter_steps, policy_loss_list, label="policy_loss")
+                if critic_loss_list:
+                    plt.plot(iter_steps, critic_loss_list, label="critic_loss")
                 plt.xlabel("Training iteration")
                 plt.ylabel("Loss")
                 plt.title(f"Training losses (per-iteration) - {eval_env_id or d4rl_env}")
@@ -1079,6 +1120,9 @@ def experiment(variant):
     print("finished training at: " + end_time_str)
     print("=" * 60)
 
+    # Final checkpoint summary.
+    print(f"Model checkpoint path: {save_path}")
+
     # Final summary of plot directory for Slurm logs.
     print(f"All plots for this run saved under: {plot_run_dir}")
 
@@ -1105,6 +1149,10 @@ def experiment(variant):
                 )
             if rl_loss_list:
                 plt.plot(iter_steps, rl_loss_list, label="rl_loss")
+            if policy_loss_list:
+                plt.plot(iter_steps, policy_loss_list, label="policy_loss")
+            if critic_loss_list:
+                plt.plot(iter_steps, critic_loss_list, label="critic_loss")
             plt.xlabel("Training iteration")
             plt.ylabel("Loss")
             plt.title(f"Training losses (per-iteration) - {eval_env_id or d4rl_env}")
@@ -1156,6 +1204,8 @@ def experiment(variant):
             act_ma, x_act = moving_average(step_action_loss_list) if step_action_loss_list else (None, None)
             temp_ma, x_temp = moving_average(step_temperature_loss_list) if step_temperature_loss_list else (None, None)
             rl_ma, x_rl = moving_average(step_rl_loss_list) if step_rl_loss_list else (None, None)
+            pol_ma, x_pol = moving_average(step_policy_loss_list) if step_policy_loss_list else (None, None)
+            critic_ma, x_critic = moving_average(step_critic_loss_list) if step_critic_loss_list else (None, None)
 
             fine_loss_plot_path = os.path.join(
                 plot_run_dir, f"{d4rl_env}_training_losses_steps_{start_time_str}.png"
@@ -1170,6 +1220,10 @@ def experiment(variant):
                 plt.plot(x_temp, temp_ma, label="temperature_loss_MA")
             if rl_ma is not None:
                 plt.plot(x_rl, rl_ma, label="rl_loss_MA")
+            if pol_ma is not None:
+                plt.plot(x_pol, pol_ma, label="policy_loss_MA")
+            if critic_ma is not None:
+                plt.plot(x_critic, critic_ma, label="critic_loss_MA")
             plt.xlabel("Update step")
             plt.ylabel("Loss (moving average)")
             plt.title(
@@ -1249,6 +1303,65 @@ if __name__ == "__main__":
         type=str,
         default=None,
         help="Optional path to a pretrained checkpoint to load before online finetuning.",
+    )
+    parser.add_argument(
+        "--online_training",
+        action="store_true",
+        help="Enable online finetuning loop after offline training.",
+    )
+    parser.add_argument(
+        "--beta_rl",
+        type=float,
+        default=0.0,
+        help="Weight for the advantage-weighted RL loss during online finetuning.",
+    )
+    parser.add_argument(
+        "--adv_scale",
+        type=float,
+        default=1.0,
+        help="Scaling factor for advantage weighting during online finetuning.",
+    )
+    parser.add_argument(
+        "--reinforce_online",
+        action="store_true",
+        help="If set, use REINFORCE-style updates during online training on new rollouts only.",
+    )
+    parser.add_argument(
+        "--baseline",
+        action="store_true",
+        help=(
+            "When used with --reinforce_online, use the model's RTG predictions as a baseline "
+            "and fit them with an expectile (tau) critic loss."
+        ),
+    )
+    parser.add_argument(
+        "--no_buffer",
+        action="store_true",
+        help="When used with --reinforce_online, do not reuse a replay buffer; train only on the newly collected rollouts each iteration (batch size = num_online_rollouts_per_iter).",
+    )
+    parser.add_argument(
+        "--online_buffer_size",
+        type=int,
+        default=None,
+        help="Size of the replay buffer used during online finetuning; defaults to size of offline dataset.",
+    )
+    parser.add_argument(
+        "--num_online_rollouts_per_iter",
+        type=int,
+        default=1,
+        help="How many new online trajectories to collect each online iteration.",
+    )
+    parser.add_argument(
+        "--rtg_gamma",
+        type=float,
+        default=1.0,
+        help="Discount factor used when computing returns-to-go from rewards for online rollouts.",
+    )
+    parser.add_argument(
+        "--critic_coef",
+        type=float,
+        default=1.0,
+        help="Weight on the critic/expectile loss when using REINFORCE with a baseline.",
     )
     parser.add_argument("--device", type=str, default="cuda")
     parser.add_argument("--seed", type=int, default=2024)
