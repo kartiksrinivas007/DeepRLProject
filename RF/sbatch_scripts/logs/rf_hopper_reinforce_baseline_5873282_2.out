@@ -8,3 +8,5 @@ plots: sbatch_scripts/logs/reinforce_online_baseline/critic_0.01/tau_0.99/buffer
 model: models/reinforce_online_baseline/critic_0.01/tau_0.99/buffered/rollouts_5_updates_1/iters_300/hopper-medium_reinforce_baseline.pt
 ------------------------------------------------------------
 Wed Dec 10 12:32:44 EST 2025
+Wed Dec 10 14:44:25 EST 2025
+REINFORCE baseline run completed.

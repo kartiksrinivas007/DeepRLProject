@@ -1,0 +1,33 @@
+============================================================
+start time: 25-12-10-19-18-33
+============================================================
+dataset size: 1044
+returns max : 6198.8984375
+returns mean: 5701.642578125
+returns std : 1179.248291015625
+returns min : 0.20352840423583984
+Using Minari eval environment: Walker2d-v5
+Loaded pretrained model from models/walker/reinformer_walker_medium_best_K5_enc4_lr1e-4_iter26.pt
+Running initial evaluation before training...
+[Online] Iteration 1/5 - last training loss: -1790.5205, last eval raw return: 3822.98, last eval normalized score: 83.24
+[Online] Iteration 2/5 - last training loss: 8558.4277, last eval raw return: 4489.04, last eval normalized score: 97.75
+[Online] Iteration 3/5 - last training loss: 14309.4893, last eval raw return: 3915.23, last eval normalized score: 85.25
+[Online] Iteration 4/5 - last training loss: -1062.8240, last eval raw return: 2579.07, last eval normalized score: 56.15
+[Online] Iteration 5/5 - last training loss: -1409.4844, last eval raw return: 4144.77, last eval normalized score: 90.25
+Evaluation scores over iterations: [87.0791834144024, 83.24164493212774, 97.75068001732974, 85.25125284636376, 56.14529871105025, 90.25132977827579]
+Raw returns over iterations: [3999.147821075446, 3822.979055162826, 4489.041120038297, 3915.2335427345956, 2579.074949299934, 4144.770624025565]
+Saved raw return evaluation plot to sbatch_scripts/logs/reinforce_online_baseline_walker_test_local/critic_1.0/tau_0.99/no_buffer/model_0/rollouts_5_updates_1/iters_5/plots/no_buffer/walker2d-medium-v2_eval_raw_return_25-12-10-19-18-33.png
+Saved normalized evaluation plot to sbatch_scripts/logs/reinforce_online_baseline_walker_test_local/critic_1.0/tau_0.99/no_buffer/model_0/rollouts_5_updates_1/iters_5/plots/no_buffer/walker2d-medium-v2_eval_25-12-10-19-18-33.png
+Saved training loss plot to sbatch_scripts/logs/reinforce_online_baseline_walker_test_local/critic_1.0/tau_0.99/no_buffer/model_0/rollouts_5_updates_1/iters_5/plots/no_buffer/walker2d-medium-v2_training_losses_25-12-10-19-18-33.png
+Saved training stats plot to sbatch_scripts/logs/reinforce_online_baseline_walker_test_local/critic_1.0/tau_0.99/no_buffer/model_0/rollouts_5_updates_1/iters_5/plots/no_buffer/walker2d-medium-v2_training_stats_25-12-10-19-18-33.png
+============================================================
+finished training!
+Saved model checkpoint to models/reinforce_online_baseline_walker_test_local/critic_1.0/tau_0.99/no_buffer/model_0/rollouts_5_updates_1/iters_5/walker-medium_reinforce_baseline.pt
+finished training at: 25-12-10-19-20-32
+============================================================
+Model checkpoint path: models/reinforce_online_baseline_walker_test_local/critic_1.0/tau_0.99/no_buffer/model_0/rollouts_5_updates_1/iters_5/walker-medium_reinforce_baseline.pt
+All plots for this run saved under: sbatch_scripts/logs/reinforce_online_baseline_walker_test_local/critic_1.0/tau_0.99/no_buffer/model_0/rollouts_5_updates_1/iters_5/plots/no_buffer
+Saved per-iteration training loss plot to sbatch_scripts/logs/reinforce_online_baseline_walker_test_local/critic_1.0/tau_0.99/no_buffer/model_0/rollouts_5_updates_1/iters_5/plots/no_buffer/walker2d-medium-v2_training_losses_25-12-10-19-18-33.png
+Saved per-iteration training stats plot to sbatch_scripts/logs/reinforce_online_baseline_walker_test_local/critic_1.0/tau_0.99/no_buffer/model_0/rollouts_5_updates_1/iters_5/plots/no_buffer/walker2d-medium-v2_training_stats_25-12-10-19-18-33.png
+Saved per-update training loss plot to sbatch_scripts/logs/reinforce_online_baseline_walker_test_local/critic_1.0/tau_0.99/no_buffer/model_0/rollouts_5_updates_1/iters_5/plots/no_buffer/walker2d-medium-v2_training_losses_steps_25-12-10-19-18-33.png
+Saved per-update training stats plot to sbatch_scripts/logs/reinforce_online_baseline_walker_test_local/critic_1.0/tau_0.99/no_buffer/model_0/rollouts_5_updates_1/iters_5/plots/no_buffer/walker2d-medium-v2_training_stats_steps_25-12-10-19-18-33.png

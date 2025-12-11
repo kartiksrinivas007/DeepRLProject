@@ -1,0 +1,10 @@
+------------------------------------------------------------
+Walker REINFORCE baseline TEST (5 iters)
+checkpoint: RF/models/walker/reinformer_walker_medium_best_K5_enc4_lr1e-4_iter26.pt
+context_len=5, n_blocks=4, lr=1e-4
+mode: no_buffer, tau=0.99, critic_coef=1.0
+logs: sbatch_scripts/logs/reinforce_online_baseline_walker_test/critic_1.0/tau_0.99/no_buffer/model_0/rollouts_5_updates_1/iters_5/run_5874188_0.out / sbatch_scripts/logs/reinforce_online_baseline_walker_test/critic_1.0/tau_0.99/no_buffer/model_0/rollouts_5_updates_1/iters_5/run_5874188_0.err
+plots: sbatch_scripts/logs/reinforce_online_baseline_walker_test/critic_1.0/tau_0.99/no_buffer/model_0/rollouts_5_updates_1/iters_5/plots
+model: models/reinforce_online_baseline_walker_test/critic_1.0/tau_0.99/no_buffer/model_0/rollouts_5_updates_1/iters_5/walker-medium_reinforce_baseline.pt
+------------------------------------------------------------
+Wed Dec 10 07:02:17 PM EST 2025

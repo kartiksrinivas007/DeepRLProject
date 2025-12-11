@@ -8,7 +8,7 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=4
 #SBATCH --gres=gpu:1
-#SBATCH --mem=40G
+#SBATCH --mem=80G
 #SBATCH --time=06:00:00
 #SBATCH --output=logs/rf_hopper_reinforce_baseline_%A_%a.out
 #SBATCH --error=logs/rf_hopper_reinforce_baseline_%A_%a.err

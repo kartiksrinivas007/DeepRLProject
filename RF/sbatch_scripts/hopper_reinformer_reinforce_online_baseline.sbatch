@@ -12,7 +12,7 @@
 #SBATCH --time=06:00:00
 #SBATCH --output=logs/rf_hopper_reinforce_baseline_%A_%a.out
 #SBATCH --error=logs/rf_hopper_reinforce_baseline_%A_%a.err
-#SBATCH --array=0-11
+#SBATCH --array=0-1
 
 set -euo pipefail
 
@@ -24,19 +24,13 @@ N_BLOCKS=6
 ONLINE_BUFFER_SIZE=500
 NUM_ROLLOUTS_PER_ITER=5
 NUM_UPDATES_PER_ITER=1
-MAX_TRAIN_ITERS=300
+MAX_TRAIN_ITERS=600
 RTG_GAMMA=0.99
-CRITIC_VALUES=(0.01 1.0 10.0)
-# Each critic value spans two modes (buffered/no_buffer) and three tau values.
-# Index mapping: critic_idx = task_id / 6, tau_idx = (task_id % 6) / 2, mode_idx = task_id % 2
-CRITIC_INDEX=$(( (${SLURM_ARRAY_TASK_ID:-0}) / 6 ))
-TAU_INDEX=$(( ((${SLURM_ARRAY_TASK_ID:-0}) % 6) / 2 ))
-MODE_INDEX=$(( (${SLURM_ARRAY_TASK_ID:-0}) % 2 ))
+CRITIC_VALUES=(0.01 1.0)
+CRITIC_INDEX=$(( (${SLURM_ARRAY_TASK_ID:-0}) ))
 CRITIC_COEF="${CRITIC_VALUES[$CRITIC_INDEX]}"
-
-# Tau sweep (for expectile baseline), paired with mode (buffered/no_buffer).
-TAU_VALUES=(0.5 0.99)
-TAU="${TAU_VALUES[$TAU_INDEX]}"
+TAU=0.99
+MODE_INDEX=1  # force no_buffer
 
 NO_BUFFER_FLAG=""
 RUN_MODE="buffered"

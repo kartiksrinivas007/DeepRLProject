@@ -1,0 +1,11 @@
+============================================================
+start time: 25-12-10-18-30-03
+============================================================
+dataset size: 1044
+returns max : 6198.8984375
+returns mean: 5701.642578125
+returns std : 1179.248291015625
+returns min : 0.20352840423583984
+Using Minari eval environment: Walker2d-v5
+Warning: could not load pretrained model: [Errno 2] No such file or directory: 'RF/models/walker/reinformer_walker_medium_best_K5_enc4_lr4e-4_iter15.pt'
+Running initial evaluation before training...
